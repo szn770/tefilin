@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>הנחת?! – מבצע תפילין</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&family=Secular+One&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div id="app">
+    <canvas id="game"></canvas>
+
+    <!-- תגיות ובועות שעוקבות אחרי הדמויות -->
+    <div id="tags"></div>
+    <div id="bubbles"></div>
+
+    <!-- HUD עליון -->
+    <div id="hud" class="hidden">
+      <div class="hud-box" id="hud-level">
+        <span id="level-val">שלב 1</span>
+        <small id="level-name"></small>
+      </div>
+      <div class="hud-box" id="hud-hearts" title="שם טוב – כל טעות או קנס מורידים לב">
+        <span id="hearts-val">❤️❤️❤️</span>
+      </div>
+      <div class="hud-box" id="hud-nachat">
+        <span class="ico">💛</span>
+        <span id="nachat-val">0</span>
+      </div>
+      <div class="hud-box hidden" id="hud-combo">
+        <span class="ico">🔥</span>
+        <span id="combo-val">x1</span>
+      </div>
+      <div class="hud-sun">
+        <div class="sun-track">
+          <div class="sun-fill" id="sun-fill"></div>
+          <div class="sun-icon" id="sun-icon">☀️</div>
+        </div>
+        <small id="sun-label">עד השקיעה</small>
+      </div>
+      <div class="hud-box" id="hud-seats" title="מקומות בדוכן">
+        <span class="ico">🪑</span>
+        <span id="seats-val">0/2</span>
+      </div>
+      <div class="hud-box" id="hud-goal">
+        <span class="ico">📿</span>
+        <span id="goal-val">0/6</span>
+      </div>
+      <div class="hud-box hidden" id="hud-trash" title="לכלוך ליד הדוכן">
+        <span class="ico">🗑️</span>
+        <span id="trash-val">0</span>
+      </div>
+      <button id="btn-mute" class="round-btn" title="שמע">🔊</button>
+    </div>
+
+    <!-- כפתורי פעולה (שדרוגים) -->
+    <button id="btn-nigun" class="hidden" title="ניגון – מאט את כולם">
+      <span class="nigun-fill" id="nigun-fill"></span>
+      <span class="nigun-ico">🎵</span>
+    </button>
+    <button id="btn-flyers" class="hidden" title="עלונים – הממהרים במסך צריכים רק לחיצה אחת">
+      <span class="nigun-ico">📄</span>
+      <b id="flyers-val">0</b>
+    </button>
+
+    <div id="banner" class="hidden">
+      <div class="banner-step" id="banner-step"></div>
+      <div class="banner-hint" id="banner-hint"></div>
+    </div>
+
+    <div id="popups"></div>
+
+    <!-- מסך פתיחה -->
+    <div id="screen-start" class="screen">
+      <div class="card">
+        <div class="logo">הנחת?!</div>
+        <div class="subtitle">מבצע תפילין עם מנדי</div>
+        <ul class="rules">
+          <li><span>👆</span>לוחצים על עוברים ושבים כדי לקרוא להם להניח תפילין</li>
+          <li><span>📱</span>מי שממהר צריך כמה לחיצות – תזדרזו לפני שהוא עובר!</li>
+          <li><span>🙅</span>לא קוראים לנשים ולילדים – זה מוריד נחת ולב ❤️. בלי לבבות – השלב נגמר!</li>
+          <li><span>🏪</span>בדוכן יש מקום מוגבל – קונים עוד תפילין, דוכנים ושלוחים</li>
+          <li><span>🌅</span>כל שלב נגמר בשקיעה, ובכל שלב יש הפתעה חדשה</li>
+        </ul>
+        <button class="big-btn hidden" id="btn-continue">המשך</button>
+        <button class="big-btn" id="btn-start">יאללה, מתחילים!</button>
+      </div>
+    </div>
+
+    <!-- פתיחת שלב -->
+    <div id="screen-intro" class="screen hidden">
+      <div class="card intro">
+        <div class="intro-level" id="intro-level">שלב 1</div>
+        <div class="logo small" id="intro-name"></div>
+        <div class="intro-new">
+          <div class="intro-icon" id="intro-icon"></div>
+          <div>
+            <b id="intro-title"></b>
+            <p id="intro-text"></p>
+          </div>
+        </div>
+        <div class="intro-goal" id="intro-goal"></div>
+        <button class="big-btn" id="btn-go">יאללה!</button>
+      </div>
+    </div>
+
+    <!-- סוף שלב + חנות -->
+    <div id="screen-shop" class="screen hidden">
+      <div class="card shop">
+        <div class="logo small" id="result-title"></div>
+        <div class="result-stars" id="result-stars"></div>
+        <div class="end-stats" id="shop-summary"></div>
+        <div class="shop-head">חנות הדוכן · יש לך <b>💛 <span id="shop-score">0</span></b></div>
+        <div class="shop-tabs">
+          <button class="shop-tab" data-cat="stand">🏪 דוכן <i></i></button>
+          <button class="shop-tab" data-cat="team">🧔 צוות <i></i></button>
+          <button class="shop-tab" data-cat="outreach">📢 הסברה <i></i></button>
+        </div>
+        <div id="shop-items"></div>
+        <button class="big-btn" id="btn-next">לשלב הבא ←</button>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
