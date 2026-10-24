@@ -1,0 +1,8 @@
+# הגדרות הבנייה ל-Netlify: איך בונים את המשחק, ואיזו תיקייה עולה לאוויר
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  # Vite 8 צריך Node.js בגרסה 22.12 ומעלה
+  NODE_VERSION = "22"
