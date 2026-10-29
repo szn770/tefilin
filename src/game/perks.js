@@ -5,9 +5,8 @@ import { tween, ease } from '../engine/tween.js';
 // דברים שקונים בחנות ופועלים תוך כדי משחק: ניגון, עלונים, טנק המבצעים, בחור ניקיון, קישוטים.
 
 const NIGUN_TIME = 5;
-const TANK_EVERY = 9;
+const TANK_EVERY = [9, 6]; // לפי רמת הטנק (רמה 2: רמקול חזק)
 const CLEAN_EVERY = 5;
-export const MAX_FLYERS = 9;
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
 
 export class Perks {
@@ -17,12 +16,13 @@ export class Perks {
     this.decor = [];
     this.nigunLeft = 0;
     this.nigunCooldown = 0;
-    this.tankTimer = TANK_EVERY;
+    this.tankTimer = TANK_EVERY[0];
     this.cleanTimer = CLEAN_EVERY;
   }
 
   get u() { return this.g.upgrades; }
   nigunCooldownMax() { return this.u.speaker >= 2 ? 12 : 20; }
+  tankEvery() { return TANK_EVERY[Math.max(0, this.u.tank - 1)] ?? TANK_EVERY[0]; }
 
   // בונים מחדש את מה שרואים (טנק, קישוטים) לפי השדרוגים
   apply() {
@@ -52,7 +52,7 @@ export class Perks {
     this.nigunLeft = 0;
     this.nigunCooldown = 0;
     this.g.slowFactor = 1;
-    this.tankTimer = TANK_EVERY / 2;
+    this.tankTimer = this.tankEvery() / 2;
     this.cleanTimer = CLEAN_EVERY;
     this.placeTank();
   }
@@ -111,7 +111,7 @@ export class Perks {
     if (active && this.tank) {
       this.tankTimer -= dt;
       if (this.tankTimer <= 0) {
-        this.tankTimer = TANK_EVERY;
+        this.tankTimer = this.tankEvery();
         const { left, right } = g.edges();
         const cand = g.peds.filter((p) => p.mode === 'walk' && !p.called && !p.penalized && !p.data.type.penalty
           && p.root.position.x > left + 1.5 && p.root.position.x < right - 1.5);

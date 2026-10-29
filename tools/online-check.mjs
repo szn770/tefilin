@@ -45,6 +45,12 @@ await step('הרשמה שנייה עם אותו כינוי נדחית', async ()
   check(errorCode(err) === 'nickname_taken', `ציפינו ל-nickname_taken, קיבלנו ${errorCode(err)}`);
 });
 
+await step('כינוי עם מילה אסורה נדחה', async () => {
+  const other = createOnlineApi(async () => newClient());
+  const err = await other.signUp('ז ו נ ה', password).then(() => null, (e) => e);
+  check(errorCode(err) === 'nickname_blocked', `ציפינו ל-nickname_blocked, קיבלנו ${errorCode(err)}`);
+});
+
 await step('כניסה עם סיסמה שגויה נדחית', async () => {
   const other = createOnlineApi(async () => newClient());
   const err = await other.signIn(nickname, 'wrong-password').then(() => null, (e) => e);

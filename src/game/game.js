@@ -5,29 +5,14 @@ import { LINE_BY_ID } from '../data/lines.js';
 import { getLevel, starsFor } from '../data/levels.js';
 import { Booths, MAX_BOOTHS, MAX_SPOTS_PER_BOOTH } from './booths.js';
 import { Hazards } from './hazards.js';
-import { Perks, MAX_FLYERS } from './perks.js';
+import { Perks } from './perks.js';
+import { shopCatalog, FLYER_PACK, MAX_FLYERS } from './shop.js';
+import { TEFILLIN_ICON } from '../ui/icons.js';
 import { wait } from '../engine/tween.js';
 
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
 const LANE_Z = [0.1, 1.9];
 const SAVE_KEY = 'hanachta-save-v1';
-const FLYER_PACK = 3;
-
-// מחירי שדרוגים (לפי מספר הקניות)
-const COSTS = {
-  booths: [180, 320],
-  pairs: [50, 90, 140, 190, 250, 320, 400],
-  cake: [100],
-  decor: [150, 300, 600],
-  tank: [1500],
-  training: [200, 400, 700],
-  cleaner: [250],
-  permit: [200],
-  net: [200],
-  sign: [150, 300, 450],
-  speaker: [120, 300],
-};
-const FLYER_COST = 60;
 const SERVE_SPEED = [1, 1.2, 1.45, 1.75]; // לפי רמת הכשרת השלוחים
 // שלט: כל רמה מורידה לחיצות לסוג אחר של ממהרים
 const SIGN_RELIEF = { rushed: 1, first: 2, runner: 3 };
@@ -92,7 +77,8 @@ export class Game {
     this.stars = save?.stars ?? [];
     this.score = save?.score ?? 0;
     this.upgrades = {
-      booths: 0, pairs: 0, cake: 0, decor: 0, tank: 0, training: 0, cleaner: 0, permit: 0, net: 0, sign: 0, speaker: 0, flyers: 0,
+      booths: 0, pairs: 0, sets: 0, cake: 0, shade: 0, bin: 0, decor: 0, tank: 0,
+      training: 0, cleaner: 0, permit: 0, net: 0, sign: 0, speaker: 0, flyers: 0, gift: 0,
       ...(save?.upgrades ?? {}),
     };
   }
@@ -118,6 +104,8 @@ export class Game {
       if (!b) break;
       this.booths.addSpot(b);
     }
+    // זוג תפילין שני: השליח מניח לשניים בבת אחת
+    this.booths.booths.forEach((b, i) => { b.pairs = i < u.sets ? 2 : 1; });
     if (u.cake) this.booths.unlockLounge();
     this.frameCamera();
     this.perks.apply();
@@ -151,7 +139,7 @@ export class Game {
   edgeX() { return this.edges().right; }
 
   // ---------- כיול ----------
-  patienceTime() { return 12; }
+  patienceTime() { return 12 + 4 * this.upgrades.shade; }
   loungePatience() { return 30; }
   serveTime() { return 6 / SERVE_SPEED[this.upgrades.training]; }
   decorBonus() { return 1 + 0.05 * this.upgrades.decor; }
@@ -233,7 +221,7 @@ export class Game {
     this.save();
 
     const lines = [
-      `📿 <b>${this.served}</b> הנחות תפילין (היעד: ${L.goal})`,
+      `${TEFILLIN_ICON} <b>${this.served}</b> הנחות תפילין (היעד: ${L.goal})`,
       `💛 <b>${this.dayScore}</b> נחת בשלב`,
     ];
     if (this.firsts) lines.push(`⭐ ${this.firsts} הניחו בפעם הראשונה!`);
@@ -260,64 +248,31 @@ export class Game {
     this.beginLevel(passed ? L.index + 1 : L.index);
   }
 
-  // חנות בשלוש קטגוריות: דוכן, צוות, הסברה. כל פריט: {cat, icon, title, desc, level, cost, can, maxed, buy()}
+  // חנות בשלוש קטגוריות: דוכן, צוות, הסברה. הקטלוג והמחירים ב-shop.js; כאן מוסיפים לכל פריט את הקנייה עצמה.
   shopItems() {
     const u = this.upgrades;
-    const lvl = (key) => `רמה ${u[key]} מתוך ${COSTS[key].length}`;
-    const owned = (key) => (u[key] ? 'יש ✓' : 'אין');
-    const make = (cat, key, icon, title, desc, level, { blocked = null } = {}) => {
-      const costs = COSTS[key];
-      const maxed = u[key] >= costs.length;
-      const cost = maxed ? 0 : costs[u[key]];
-      const can = !maxed && !blocked && this.score >= cost;
-      return {
-        cat, icon, title, desc: blocked ?? desc, level, cost, maxed, can,
-        buy: () => {
-          if (!can) return;
-          this.score -= cost;
-          u[key]++;
-          this.applyUpgrades();
-          this.ui.setScore(this.score);
-          this.audio.sfx('coin');
-          this.save();
-        },
-      };
-    };
-    const spotsFull = this.booths.booths.every((b) => b.spots.length >= MAX_SPOTS_PER_BOOTH);
-    const signNext = ['📱 הממהרים בטלפון', '⭐ הקרקפתא', '⏰ הממהרים מאוד'][u.sign] ?? '';
-    const flyersFull = u.flyers >= MAX_FLYERS;
-    const flyers = {
-      cat: 'outreach', icon: '📄', title: `חומרי הסברה – ${FLYER_PACK} חבילות עלונים`,
-      desc: 'כפתור במשחק: כל הממהרים במסך צריכים רק לחיצה אחת',
-      level: `יש ${u.flyers}`, cost: FLYER_COST, maxed: flyersFull,
-      can: !flyersFull && this.score >= FLYER_COST,
-      buy: () => {
-        if (flyersFull || this.score < FLYER_COST) return;
-        this.score -= FLYER_COST;
-        u.flyers = Math.min(MAX_FLYERS, u.flyers + FLYER_PACK);
+    const items = shopCatalog({
+      u,
+      score: this.score,
+      nextLevel: this.levelIndex, // אחרי שלב שהצליח, levelIndex כבר מצביע על השלב הבא
+      booths: this.booths.booths.length,
+      maxBooths: MAX_BOOTHS,
+      spots: this.booths.boothSpots.length,
+      spotsFull: this.booths.booths.every((b) => b.spots.length >= MAX_SPOTS_PER_BOOTH),
+    });
+    for (const it of items) {
+      it.buy = () => {
+        if (!it.can) return;
+        this.score -= it.cost;
+        if (it.key === 'flyers') u.flyers = Math.min(MAX_FLYERS, u.flyers + FLYER_PACK);
+        else u[it.key]++;
+        this.applyUpgrades();
         this.ui.setScore(this.score);
         this.audio.sfx('coin');
         this.save();
-      },
-    };
-    return [
-      // ---- דוכן ----
-      make('stand', 'booths', '🏪', 'דוכן נוסף + שליח', 'עוד שליח שמניח במקביל, ועוד 2 מקומות', `דוכנים: ${this.booths.booths.length} מתוך ${MAX_BOOTHS}`),
-      make('stand', 'pairs', '📿', 'זוג תפילין נוסף', 'עוד מקום עמידה בדוכן', `מקומות: ${this.booths.boothSpots.length}`,
-        { blocked: spotsFull ? 'כל הדוכנים מלאים – קודם דוכן נוסף' : null }),
-      make('stand', 'cake', '🍰', 'פינת עוגה ולחיים', 'עוד 3 מקומות לחכות ליד הדוכן – בסבלנות', owned('cake')),
-      make('stand', 'decor', '🎈', 'קישוטים לדוכן', 'בלונים, דגלונים ואורות. כל רמה: +5% נחת', lvl('decor')),
-      make('stand', 'tank', '🚐', 'טנק המבצעים', 'חונה ברחוב וקורא לאנשים לבד, כל 9 שניות', owned('tank')),
-      // ---- צוות ----
-      make('team', 'training', '🎓', 'הכשרת שלוחים', 'השלוחים מניחים מהר יותר', lvl('training')),
-      make('team', 'cleaner', '🧹', 'בחור לניקיון', 'אוסף לכלוך לבד, כל 5 שניות', owned('cleaner')),
-      make('team', 'permit', '📜', 'רישיון ממוסגר', 'לפקח מספיקה לחיצה אחת', owned('permit')),
-      make('team', 'net', '🕸️', 'רשת נגד יונים', 'יונים מגיעות בחצי מהתדירות', owned('net')),
-      // ---- הסברה ----
-      make('outreach', 'sign', '🪧', 'שילוט גדול', signNext ? `לחיצה פחות ל${signNext}` : 'כל השלטים כבר תלויים', lvl('sign')),
-      flyers,
-      make('outreach', 'speaker', '🎵', 'רמקול ניגונים', u.speaker ? 'רמה 2: הכפתור נטען מהר יותר (12 שניות)' : 'כפתור במשחק שמאט את כולם ל-5 שניות', lvl('speaker')),
-    ];
+      };
+    }
+    return items;
   }
 
   // ---------- עוברים ושבים ----------
@@ -488,7 +443,8 @@ export class Game {
     const ped = spot.ped;
     const shliach = spot.booth.shliach;
     const T = ped.data.type;
-    const gain = Math.round(T.points * (ped.mult || 1) * this.decorBonus());
+    const gift = T.firstTime && this.upgrades.gift ? 1.5 : 1; // סידור במתנה לקרקפתא
+    const gain = Math.round(T.points * gift * (ped.mult || 1) * this.decorBonus());
     this.booths.release(spot);
     this.served++;
     this.ui.setGoal(this.served, this.level.goal);
@@ -509,8 +465,8 @@ export class Game {
       this.ui.banner('🏆 עמדת ביעד!', 'כל הנחה נוספת – עוד כוכב', 2.5);
       this.audio.sfx('fanfare');
     }
-    // כוס הלחיים נשארת על הרצפה...
-    if (Math.random() < 0.4) this.hazards.dropTrash(spot.pos.x);
+    // כוס הלחיים נשארת על הרצפה... (עם פח אשפה ליד הדוכן – פחות)
+    if (Math.random() < (this.upgrades.bin ? 0.2 : 0.4)) this.hazards.dropTrash(spot.pos.x);
     ped.setPose('cheer');
     ped.happy();
     if (Math.random() < 0.4) this.say(ped, 'c_thanks', { block: false });

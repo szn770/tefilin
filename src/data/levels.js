@@ -62,6 +62,12 @@ export function getLevel(index) {
   };
 }
 
+// השלב (מ-0) שבו משהו מופיע לראשונה. בחנות, מה שקשור אליו נפתח רק לקראת השלב הזה.
+export function firstLevelWith(feature) {
+  const i = BASE.findIndex((l) => l.features.includes(feature));
+  return i < 0 ? BASE.length : i;
+}
+
 // כוכבים לפי מספר ההנחות ביחס ליעד
 export function starsFor(level, served) {
   if (served >= Math.ceil(level.goal * 1.5)) return 3;

@@ -3,6 +3,7 @@ import { createOnlineApi } from '../online/api.js';
 import { errorCode, errorMessage } from '../online/messages.js';
 import { boardRows, needsMyRankLine } from '../online/board.js';
 import { validateNickname, validatePassword } from '../online/nickname.js';
+import { TEFILLIN_ICON } from './icons.js';
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
@@ -107,7 +108,7 @@ export class OnlineUI {
             <li class="${r.isMe ? 'me' : ''}">
               <span class="b-rank">${r.label}</span>
               <span class="b-nick">${esc(r.nickname)}</span>
-              <span class="b-total">📿 ${r.total}</span>
+              <span class="b-total">${TEFILLIN_ICON} ${r.total}</span>
               <span class="b-level">שלב ${r.level}</span>
             </li>`).join('')
         : '<li class="board-msg">עוד אין אף אחד בלוח. אולי תהיו הראשונים? 😊</li>';

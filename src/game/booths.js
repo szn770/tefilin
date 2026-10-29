@@ -5,7 +5,7 @@ import { buildBooth, buildCakeCorner } from '../world/props.js';
 import { mesh, G } from '../engine/materials.js';
 import { tween, ease } from '../engine/tween.js';
 
-// הדוכנים: לכל דוכן שליח אחד שמניח לאדם אחד בכל פעם, ו-2–3 מקומות עמידה.
+// הדוכנים: לכל דוכן שליח אחד שמניח לאדם אחד בכל פעם (עם זוג תפילין שני: לשניים), ו-2–3 עמדות המתנה.
 // פינת עוגה: עוד מקומות שבהם מחכים (ואוכלים עוגה) עד שמתפנה מקום בדוכן.
 // מצבי מקום: free → coming → waiting / lounge → serving → free
 
@@ -47,7 +47,7 @@ export class Booths {
     }
     shliach.root.position.set(x - 0.1, 0, -2.95);
     shliach.faceYaw(0.2, true);
-    const booth = { index, x, mesh, shliach, spots: [], serving: null, pigeon: null, closedUntil: 0, closedTag: null };
+    const booth = { index, x, mesh, shliach, spots: [], serving: [], pairs: 1, pigeon: null, closedUntil: 0, closedTag: null };
     this.booths.push(booth);
     this.addSpot(booth);
     this.addSpot(booth);
@@ -93,7 +93,7 @@ export class Booths {
     for (const b of this.booths) {
       const free = b.spots.find((s) => s.state === 'free');
       if (!free) continue;
-      const load = b.spots.filter((s) => s.state !== 'free').length + (b.serving ? 0.5 : 0) + (b.pigeon ? 2 : 0);
+      const load = b.spots.filter((s) => s.state !== 'free').length + (b.serving.length >= b.pairs ? 0.5 : 0) + (b.pigeon ? 2 : 0);
       if (load < bestScore) { bestScore = load; best = free; }
     }
     return best;
@@ -132,7 +132,7 @@ export class Booths {
     const b = s.booth;
     s.tag?.remove();
     s.state = 'serving';
-    b.serving = s;
+    b.serving.push(s);
     s.progress = 0;
     s.rig = new TefillinRig(s.ped, s.ped.data.lefty ? -1 : 1);
     b.shliach.faceTowards(s.pos.x, s.pos.z);
@@ -190,9 +190,12 @@ export class Booths {
     s.ped?.cakePiece?.removeFromParent();
     s.rig?.dispose();
     s.rig = null;
-    if (s.booth && s.booth.serving === s) {
-      s.booth.serving = null;
-      s.booth.shliach.faceYaw(0.2);
+    const b = s.booth;
+    if (b?.serving.includes(s)) {
+      b.serving = b.serving.filter((x) => x !== s);
+      const other = b.serving[0];
+      if (other) b.shliach.faceTowards(other.pos.x, other.pos.z);
+      else b.shliach.faceYaw(0.2);
     }
     s.ped = null;
     s.state = 'free';
@@ -219,9 +222,11 @@ export class Booths {
         b.closedTag.remove();
         b.closedTag = null;
       }
-      if (!b.serving && !b.pigeon && !this.isClosed(b)) {
+      // השליח מתחיל להניח לבא בתור, כל עוד יש לו זוג תפילין פנוי
+      while (b.serving.length < b.pairs && !b.pigeon && !this.isClosed(b)) {
         const next = b.spots.filter((s) => s.state === 'waiting').sort((a, c) => a.since - c.since)[0];
-        if (next) this.start(next);
+        if (!next) break;
+        this.start(next);
       }
     }
 

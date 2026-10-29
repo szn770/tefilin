@@ -1,4 +1,4 @@
-import { nicknameKey, nicknameToEmail, normalizeNickname, validateNickname, validatePassword } from './nickname.js';
+import { nicknameToEmail, normalizeNickname, validateNickname, validatePassword } from './nickname.js';
 import { BOARD_SIZE, MAX_SERVED_PER_LEVEL } from './rules.js';
 
 // שגיאה עם קוד מ-messages.js
@@ -25,17 +25,20 @@ export function createOnlineApi(getClient) {
     return data ? toPlayer(data) : { id: session.user.id, nickname: null, total: 0, level: 0 };
   }
 
-  async function nicknameTaken(nickname) {
+  // 'ok', 'taken' (תפוס) או 'blocked' (מכיל מילה אסורה). הבדיקה עצמה נעשית במסד הנתונים.
+  async function nicknameStatus(nickname) {
     const sb = await getClient();
-    const { data, error } = await sb.from('profiles').select('id').eq('nickname_key', nicknameKey(nickname)).maybeSingle();
+    const { data, error } = await sb.rpc('nickname_status', { p_nickname: normalizeNickname(nickname) });
     if (error) throw error;
-    return !!data;
+    return data;
   }
 
   async function signUp(nickname, password) {
     const bad = validateNickname(nickname) ?? validatePassword(password);
     if (bad) throw new OnlineError(bad);
-    if (await nicknameTaken(nickname)) throw new OnlineError('nickname_taken');
+    const status = await nicknameStatus(nickname);
+    if (status === 'taken') throw new OnlineError('nickname_taken');
+    if (status === 'blocked') throw new OnlineError('nickname_blocked');
     const sb = await getClient();
     const { data, error } = await sb.auth.signUp({
       email: nicknameToEmail(nickname),
@@ -107,5 +110,5 @@ export function createOnlineApi(getClient) {
     return count + 1;
   }
 
-  return { currentPlayer, nicknameTaken, signUp, signIn, signOut, claimNickname, submitLevel, fetchBoard, rankOf };
+  return { currentPlayer, nicknameStatus, signUp, signIn, signOut, claimNickname, submitLevel, fetchBoard, rankOf };
 }

@@ -281,7 +281,8 @@ export class Hazards {
       for (const k of Object.keys(this.timers)) this.timers[k] -= dt;
       if (L.has('trash') && this.timers.trash <= 0) {
         this.dropTrash();
-        this.timers.trash = rand(7, 11) / r;
+        // פח אשפה ליד הדוכן – פחות לכלוך
+        this.timers.trash = (rand(7, 11) / r) * (this.g.upgrades.bin ? 1.6 : 1);
       }
       if (L.has('inspector') && this.timers.inspector <= 0) {
         if (!this.inspector) this.spawnInspector();

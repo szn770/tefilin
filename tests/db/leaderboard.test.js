@@ -199,3 +199,54 @@ describe('שליחת תוצאה', () => {
     await fails(submit(uid, 0, 5), /no_profile/);
   });
 });
+
+describe('מסנן הכינויים', () => {
+  it('כינוי עם מילה אסורה מבטל את ההרשמה', async () => {
+    await fails(newUser('אחזונה'), /nickname_blocked/);
+  });
+
+  it('תופס גם רווחים בין האותיות, אותיות סופיות, ספרות ואותיות כפולות', async () => {
+    await fails(newUser('ז ו נ ה'), /nickname_blocked/);
+    await fails(newUser('sh1t'), /nickname_blocked/);
+    await fails(newUser('fuuuck'), /nickname_blocked/);
+    await fails(newUser('ערום'), /nickname_blocked/); // ברשימה: "ערומ"
+  });
+
+  it('מילה שלמה בלבד: חסומה לבד, מותרת בתוך מילה רגילה', async () => {
+    await fails(newUser('כוס'), /nickname_blocked/);
+    await fails(newUser('אבא כוס'), /nickname_blocked/);
+    await newUser(uniq('כוסמת'));
+    await newUser(uniq('ציצית'));
+    await newUser(uniq('מתחת'));
+  });
+
+  it('בחירת כינוי (Google) נבדקת גם היא', async () => {
+    const uid = await newUser();
+    await fails(as(uid, `select public.claim_nickname('שרמוטה')`), /nickname_blocked/);
+  });
+
+  it('לפני ההרשמה: ok, taken או blocked, גם לאורח', async () => {
+    const name = uniq('בודק');
+    await newUser(name);
+    const status = (nick) => as('anon', 'select public.nickname_status($1) as s', [nick]).then((r) => r.rows[0].s);
+    expect(await status(uniq('חדש'))).toBe('ok');
+    expect(await status(` ${name} `)).toBe('taken');
+    expect(await status('sex')).toBe('blocked');
+  });
+
+  it('מילה שנוספה אחר כך: השחקן נעלם מהלוח לאחרים, אבל רואה את עצמו', async () => {
+    const name = uniq('נעלם');
+    const uid = await newUser(name);
+    await db.query('insert into public.blocked_words (word) values ($1)', [name]);
+    const query = 'select id from public.profiles where id = $1';
+    expect((await as('anon', query, [uid])).rows).toHaveLength(0);
+    expect((await as(await newUser(uniq('אחר')), query, [uid])).rows).toHaveLength(0);
+    expect((await as(uid, query, [uid])).rows).toHaveLength(1);
+  });
+
+  it('אף שחקן לא רואה את רשימת המילים', async () => {
+    const uid = await newUser(uniq('סקרן'));
+    await fails(as('anon', 'select * from public.blocked_words'), /permission denied/);
+    await fails(as(uid, 'select * from public.blocked_words'), /permission denied/);
+  });
+});

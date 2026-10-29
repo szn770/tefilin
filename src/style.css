@@ -152,11 +152,19 @@ html, body {
 .tag-prog .empty { fill: #d6cfbf; stroke: #d6cfbf; }
 .tag-prog .full { fill: #1c1a20; stroke: #1c1a20; }
 .tag-prog text {
-  stroke: none; font-family: 'Secular One', sans-serif; font-size: 12px;
+  stroke: none; font-family: 'Secular One', sans-serif; font-size: 10px;
   text-anchor: middle; dominant-baseline: central;
 }
 .tag-prog .empty text { fill: #ebe6da; }
 .tag-prog .full text { fill: var(--gold); }
+
+/* סמל התפילין בתוך טקסט (מונה, סיכום, חנות, לוח השיאים) */
+.tfl-ico { width: 1.1em; height: 1.05em; vertical-align: -.2em; overflow: visible; }
+.tfl-ico g { fill: #1c1a20; stroke: #1c1a20; stroke-linecap: round; stroke-linejoin: round; }
+.tfl-ico text {
+  fill: var(--gold); stroke: none; font-family: 'Secular One', sans-serif; font-size: 10px;
+  text-anchor: middle; dominant-baseline: central;
+}
 
 /* ---------- Speech bubbles ---------- */
 #bubbles { position: absolute; inset: 0; pointer-events: none; }
@@ -228,6 +236,8 @@ html, body {
   padding: 8px 12px; margin: 8px 0;
 }
 .shop-card.maxed { opacity: .6; }
+.shop-card.locked { opacity: .55; background: #f1ede4; border-style: dashed; }
+.shop-card.locked .shop-icon { filter: grayscale(1); }
 .shop-icon { font-size: 34px; width: 44px; text-align: center; flex: none; }
 .shop-text { flex: 1; display: flex; flex-direction: column; }
 .shop-text b { font-size: 18px; }

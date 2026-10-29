@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { TEFILLIN_ICON, TEFILLIN_SHAPES } from './icons.js';
 
 const $ = (id) => document.getElementById(id);
 const tmp = new THREE.Vector3();
@@ -10,6 +11,7 @@ export class UI {
     this.bubbles = [];
     this.tags = new Set();
     this.tagSeq = 0;
+    for (const el of document.querySelectorAll('[data-icon="tefillin"]')) el.innerHTML = TEFILLIN_ICON;
   }
 
   project(world) {
@@ -74,17 +76,12 @@ export class UI {
   // תפילין של ראש מעל מי שמניח: מתמלאות בצבע מלמטה למעלה, עד שמסיימים
   progressTag(anchorFn) {
     const clip = `tfl-fill-${++this.tagSeq}`;
-    const tefillin = `
-      <rect x="11" y="25" width="22" height="6" rx="1.5"/>
-      <rect x="14" y="9" width="16" height="17" rx="2.5"/>
-      <path d="M15 31 L11 40 M29 31 L33 40"/>
-      <text x="22" y="18">ש</text>`;
     const t = this.addTag(anchorFn, 'tag-prog', `
       <svg viewBox="0 0 44 44">
         <defs><clipPath id="${clip}"><rect class="level" x="0" y="44" width="44" height="44"/></clipPath></defs>
         <circle class="badge" cx="22" cy="22" r="20"/>
-        <g class="empty">${tefillin}</g>
-        <g class="full" clip-path="url(#${clip})">${tefillin}</g>
+        <g class="empty">${TEFILLIN_SHAPES}</g>
+        <g class="full" clip-path="url(#${clip})">${TEFILLIN_SHAPES}</g>
       </svg>`);
     const level = t.el.querySelector('.level');
     t.set = (f) => level.setAttribute('y', 44 * (1 - Math.max(0, Math.min(1, f))));
@@ -262,8 +259,8 @@ export class UI {
       list.innerHTML = '';
       for (const it of all.filter((x) => x.cat === this.shopTab)) {
         const card = document.createElement('div');
-        card.className = 'shop-card' + (it.maxed ? ' maxed' : '');
-        const btnText = it.maxed ? 'מקסימום' : `💛 ${it.cost}`;
+        card.className = 'shop-card' + (it.maxed ? ' maxed' : '') + (it.locked ? ' locked' : '');
+        const btnText = it.maxed ? 'מקסימום' : it.locked ? '🔒' : `💛 ${it.cost}`;
         card.innerHTML = `
           <div class="shop-icon">${it.icon}</div>
           <div class="shop-text"><b>${it.title}</b><small>${it.desc}</small><span class="lvl">${it.level}</span></div>

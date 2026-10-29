@@ -73,9 +73,20 @@ describe('הרשמה', () => {
     const { api } = fakeSupabase();
     await expect(api.signUp('דודי', '123')).rejects.toThrow('password_short');
   });
-  it('כינוי תפוס (גם באותיות אחרות): לא נרשמים', async () => {
-    const { api, log } = fakeSupabase({ profiles: [{ id: 'x', nickname_key: 'dudi' }] });
+  it('בודקים את הכינוי הנקי במסד הנתונים לפני ההרשמה', async () => {
+    const { api, log } = fakeSupabase({ rpcResult: { nickname_status: { data: 'ok', error: null } } });
+    await api.signUp('  דודי   כהן ', '123456');
+    expect(log.rpc[0]).toEqual(['nickname_status', { p_nickname: 'דודי כהן' }]);
+  });
+  it('כינוי תפוס: לא נרשמים', async () => {
+    const { api, log } = fakeSupabase({ rpcResult: { nickname_status: { data: 'taken', error: null } } });
     await expect(api.signUp(' Dudi ', '123456')).rejects.toThrow('nickname_taken');
+    expect(log.auth).toHaveLength(0);
+  });
+  it('כינוי עם מילה אסורה: לא נרשמים', async () => {
+    const { api, log } = fakeSupabase({ rpcResult: { nickname_status: { data: 'blocked', error: null } } });
+    const err = await api.signUp('משהו', '123456').catch((e) => e);
+    expect(errorCode(err)).toBe('nickname_blocked');
     expect(log.auth).toHaveLength(0);
   });
   it('נרשמים עם האימייל הפנימי והכינוי הנקי', async () => {
