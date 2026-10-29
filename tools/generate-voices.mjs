@@ -6,6 +6,7 @@
 // אפשרויות:
 //   --force           להקליט מחדש גם משפטים שכבר קיימים
 //   --only=id1,id2    להקליט רק משפטים מסוימים
+//   --training        להקליט רק את המשפטים של ההדרכה (npm run voices:training)
 //   --sfx             ליצור גם רעשי רקע (רחוב)
 //   --dry-run         רק להציג מה יוקלט, בלי לשלוח בקשות
 //   --list-voices     להציג את הקולות שזמינים בחשבון (כדי לבחור קולות ב-tools/voices.json)
@@ -13,7 +14,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { LINES, VOICE_KEYS } from '../src/data/lines.js';
+import { LINES, VOICE_KEYS, TRAINING_LINE_IDS } from '../src/data/lines.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = path.join(ROOT, 'public', 'audio');
@@ -47,7 +48,7 @@ async function main() {
     if (!voices[k]) throw new Error(`אין קול מוגדר עבור "${k}" ב-tools/voices.json`);
   }
 
-  const only = opt('only')?.split(',');
+  const only = flag('training') ? TRAINING_LINE_IDS : opt('only')?.split(',');
   const jobs = [];
   for (const line of LINES) {
     if (only && !only.includes(line.id)) continue;

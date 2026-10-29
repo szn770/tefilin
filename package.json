@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "voices": "node tools/generate-voices.mjs",
     "voices:list": "node tools/generate-voices.mjs --list-voices",
+    "voices:training": "node tools/generate-voices.mjs --training",
     "test": "vitest run tests/unit",
     "db:migrate": "node tools/db-migrate.mjs",
     "test:db": "vitest run tests/db --no-file-parallelism",

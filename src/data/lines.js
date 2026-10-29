@@ -47,8 +47,9 @@ export const LINES = [
   { id: 's_sure', voices: ['man2'], text: 'בטח! זכות לחיילים!', say: 'בֶּטַח! זְכוּת לַחַיָּלִים!' },
   { id: 'g_long', voices: ['oldman'], text: 'לא הנחתי מאז הבר מצווה...', say: 'לֹא הִנַּחְתִּי מֵאָז הַבַּר מִצְוָה...' },
   { id: 'c_dirty', voices: MEN, text: 'איכס, מלוכלך פה!', say: 'אִיכְס, מְלֻכְלָךְ פֹּה!' },
-  { id: 'c_lefty', voices: MEN, text: 'אני שמאלי!', say: 'אֲנִי שְׂמָאלִי!' },
-  { id: 'c_righty', voices: MEN, text: 'אני כותב ביד ימין', say: 'אֲנִי כּוֹתֵב בַּיָּד יָמִין' },
+  // המתלמד בהדרכה הוא תמיד 'man' – קול אחר משל מנדי
+  { id: 'c_lefty', voices: ['man'], text: 'אני שמאלי!', say: 'אֲנִי שְׂמָאלִי!' },
+  { id: 'c_righty', voices: ['man'], text: 'אני כותב ביד ימין', say: 'אֲנִי כּוֹתֵב בַּיָּד יָמִין' },
   { id: 'f_hmm', voices: ['man'], text: 'אני? אף פעם לא הנחתי...', say: 'אֲנִי? אַף פַּעַם לֹא הִנַּחְתִּי...' },
   { id: 'f_first', voices: ['man'], text: 'טוב... בוא ננסה!', say: 'טוֹב... בּוֹא נְנַסֶּה!' },
   { id: 'w_no', voices: ['woman'], text: 'אני אישה! 😄', say: 'אֲנִי אִשָּׁה!' },
@@ -58,3 +59,9 @@ export const LINES = [
 ];
 
 export const LINE_BY_ID = Object.fromEntries(LINES.map((l) => [l.id, l]));
+
+// מה שנשמע בהדרכה. npm run voices:training מקליט רק את אלה
+export const TRAINING_LINE_IDS = [
+  'm_learn', 'm_repeat', 'm_bracha', 'm_wrap', 'm_rosh', 'm_finger', 'm_shema', 'm_shema_text',
+  'm_remove', 'm_lechaim', 'm_mazal', 'c_lefty', 'c_righty', 'c_thanks',
+];

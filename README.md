@@ -142,6 +142,7 @@ npm run voices
 - `npm run voices -- --dry-run`: מציג מה יוקלט, בלי לשלוח כלום.
 - `npm run voices -- --sfx`: מקליט גם רעשי רחוב ברקע.
 - `npm run voices -- --only=m_call,m_full`: מקליט רק משפטים מסוימים.
+- `npm run voices:training`: מקליט רק את משפטי ההדרכה (מנדי בקול `mendy`, המתלמד בקול `man`). הרשימה ב-`TRAINING_LINE_IDS` שב-`src/data/lines.js`.
 - `npm run voices -- --force`: מקליט מחדש משפטים שכבר קיימים.
 - `npm run voices:list`: מציג את הקולות שבחשבון.
 

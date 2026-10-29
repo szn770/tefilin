@@ -1,5 +1,22 @@
 {
-  "voices": [],
+  "voices": [
+    "c_lefty",
+    "c_righty",
+    "c_thanks__man",
+    "c_thanks__man2",
+    "c_thanks__oldman",
+    "m_bracha",
+    "m_finger",
+    "m_learn",
+    "m_lechaim",
+    "m_mazal",
+    "m_remove",
+    "m_repeat",
+    "m_rosh",
+    "m_shema",
+    "m_shema_text",
+    "m_wrap"
+  ],
   "sfx": [
     "nigun"
   ],
