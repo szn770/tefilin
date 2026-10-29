@@ -10,6 +10,8 @@ export class GameAudio {
     this.available = new Set();
     this.buffers = new Map();
     this.loops = [];
+    // קולות מוקלטים רק בהדרכה. במשחק הרגיל הם מבלבלים, ולכן שם יש רק בועות טקסט
+    this.voicesOn = false;
   }
 
   async init() {
@@ -60,7 +62,7 @@ export class GameAudio {
   async voice(id, voiceKey) {
     const line = LINE_BY_ID[id];
     const estimate = line ? Math.max(1.1, line.text.length * 0.07) : 1.2;
-    if (!this.ctx) return estimate;
+    if (!this.ctx || !this.voicesOn) return estimate;
     const candidates = [`voice/${id}__${voiceKey}`, `voice/${id}`];
     const key = candidates.find((k) => this.available.has(k));
     if (!key) return estimate;

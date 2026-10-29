@@ -40,6 +40,7 @@ export class Training {
     const g = this.g;
     g.state = 'training';
     g.training = this;
+    g.audio.voicesOn = true; // בהדרכה מנדי והמתלמד מדברים בקול
     g.ui.showHud(false);
     g.world.setDayProgress(0.1);
     const exit = document.getElementById('btn-learn-exit');

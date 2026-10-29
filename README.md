@@ -129,6 +129,8 @@ npm run dev
 
 ## קולות עם ElevenLabs
 
+הקולות המוקלטים נשמעים רק בהדרכה. במשחק הרגיל יש רק בועות טקסט, גם כשיש הקלטות (`voicesOn` ב-`src/audio/audio.js`).
+
 1. מעתיקים את `.env.example` לקובץ `.env` ומדביקים את המפתח בשורה `ELEVENLABS_API_KEY=`.
 2. מריצים:
 
