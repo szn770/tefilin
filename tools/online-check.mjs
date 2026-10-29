@@ -3,12 +3,13 @@
 import { createClient } from '@supabase/supabase-js';
 import { createOnlineApi } from '../src/online/api.js';
 import { errorCode } from '../src/online/messages.js';
+import * as config from '../src/online/config.js';
 import { connect, loadEnv } from './db.mjs';
 
 loadEnv();
-const url = process.env.VITE_SUPABASE_URL;
-const key = process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-if (!url || !key) throw new Error('חסרים VITE_SUPABASE_URL או VITE_SUPABASE_PUBLISHABLE_KEY בקובץ .env');
+const url = process.env.VITE_SUPABASE_URL || config.SUPABASE_URL;
+const key = process.env.VITE_SUPABASE_PUBLISHABLE_KEY || config.SUPABASE_PUBLISHABLE_KEY;
+if (!url || !key) throw new Error('חסרים הכתובת או המפתח של Supabase ב-src/online/config.js');
 
 const newClient = () => createClient(url, key, { auth: { persistSession: false } });
 const nickname = `בדיקה${String(Math.floor(Math.random() * 1e6)).padStart(6, '0')}`;

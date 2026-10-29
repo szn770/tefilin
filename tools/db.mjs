@@ -9,7 +9,7 @@ export function dbConfig(env = process.env) {
   const url = env.SUPABASE_DB_URL;
   const password = env.SUPABASE_DB_PASSWORD;
   if (!url || !password) {
-    throw new Error('חסרים SUPABASE_DB_URL או SUPABASE_DB_PASSWORD בקובץ .env. ממלאים אותם באשף ההגדרות, בנושא Supabase.');
+    throw new Error('חסרים SUPABASE_DB_URL או SUPABASE_DB_PASSWORD בקובץ .env. הם נמצאים רק במחשב של בעל המשחק (ראו docs/TECH.md).');
   }
   return {
     connectionString: url.replace('[YOUR-PASSWORD]', encodeURIComponent(password)),

@@ -3,3 +3,5 @@ dist
 .env
 # local setup: keys and wizard state, never commit
 .setup/
+# the Supabase CLI cache
+supabase/.temp/

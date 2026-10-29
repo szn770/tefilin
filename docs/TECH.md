@@ -18,10 +18,17 @@
 
 | שם | סודי? | איפה משתמשים בו |
 |---|---|---|
-| `VITE_SUPABASE_URL` | לא (פתק ההכוונה) | המשחק. נשמר ב-`.env` במחשב וב-Cloudflare |
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | לא (פתק ההכוונה) | המשחק. נשמר ב-`.env` במחשב וב-Cloudflare |
-| `SUPABASE_DB_URL` | כן (הפנקס הסודי) | רק במחשב: בניית הטבלאות והבדיקות |
-| `SUPABASE_DB_PASSWORD` | כן (הפנקס הסודי) | רק במחשב: בניית הטבלאות והבדיקות |
+| הכתובת של Supabase | לא (פתק ההכוונה) | המשחק. כתובה ב-`src/online/config.js`, ואפשר לדרוס אותה ב-`.env` בשם `VITE_SUPABASE_URL` |
+| המפתח הציבורי (publishable) | לא (פתק ההכוונה) | המשחק. כתוב ב-`src/online/config.js`, ואפשר לדרוס אותו ב-`.env` בשם `VITE_SUPABASE_PUBLISHABLE_KEY` |
+| `SUPABASE_DB_URL` | כן (הפנקס הסודי) | רק במחשב, ב-`.env`: בניית הטבלאות והבדיקות. משתמשים ב-Session pooler (פורט 5432) |
+| `SUPABASE_DB_PASSWORD` | כן (הפנקס הסודי) | רק במחשב, ב-`.env`: בניית הטבלאות והבדיקות |
+| `SUPABASE_PROJECT_REF` | לא | רק במחשב, ב-`.env`: המזהה של הפרויקט (`divouiumlugsgnhzgjrk`) |
+
+הכתובת והמפתח הציבורי נמצאים בקוד ולא בהגדרות של Cloudflare, ולכן אין שם מה להגדיר: כל עדכון ב-GitHub עולה עם הלוח מחובר.
+
+### רשת מסוננת (נטספארק)
+
+במחשב של בעל המשחק יש סינון של נטספארק. הכלי של Supabase (`supabase` CLI) לא עובר דרך הסינון ומחזיר "Transport error". Node כן עובר, כשהוא משתמש בתעודות של Windows, ולכן כל הכלים של הפרויקט (`tools/`) כתובים ב-Node. ההגדרות ב-Supabase (אישור אימייל כבוי, כתובת האתר) נעשו דרך ה-Management API.
 | Client Secret של Google | כן | רק בהגדרות של Supabase, לא אצלנו |
 
 ## שירותים שצריך לפתוח בהם חשבון
