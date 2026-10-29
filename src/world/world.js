@@ -145,20 +145,20 @@ export class World {
       const body = mesh(G.box(w, h, 4), stones[i % stones.length], { outline: false, receive: true });
       body.position.y = h / 2;
       b.add(body);
-      // חלונות
+      // חלונות: מתחילים מעל שלט החנות, ובקומה הראשונה אין מרפסות כדי שלא יסתירו אותו
       const floors = Math.floor((h - 3) / 2.2);
       const cols = Math.max(1, Math.floor(w / 1.6));
       for (let f = 0; f < floors; f++) {
         for (let c = 0; c < cols; c++) {
           const wx = -w / 2 + (c + 0.5) * (w / cols);
-          const wy = 4 + f * 2.2;
+          const wy = 4.3 + f * 2.2;
           const frame = mesh(G.rbox(0.9, 1.2, 0.12, 0.05), 0x7aa6c2, { outline: false, shadow: false });
           frame.position.set(wx, wy, 2.02);
           b.add(frame);
           const shutter = mesh(G.box(0.12, 1.2, 0.06), 0x3f7d5a, { outline: false, shadow: false });
           shutter.position.set(wx - 0.55, wy, 2.03);
           b.add(shutter);
-          if (Math.random() < 0.3) {
+          if (f > 0 && Math.random() < 0.3) {
             const balc = mesh(G.box(1.3, 0.12, 0.6), 0xd6c39c, { outline: false });
             balc.position.set(wx, wy - 0.7, 2.3);
             b.add(balc);
@@ -189,18 +189,18 @@ export class World {
   }
 
   buildStreetProps() {
-    // עצים בעציצים ופנסי רחוב
+    // עצים בעציצים ופנסי רחוב. העצים נמוכים מספיק כדי לא להסתיר את שלטי החנויות
     const treeSpots = [-11, -6.5, 5, 10.5];
     for (const tx of treeSpots) {
       const pot = mesh(G.cyl(0.45, 0.35, 0.6, 14), 0xb5652b);
       pot.position.set(tx, 0.3, -7.2);
-      const trunk = mesh(G.cyl(0.09, 0.12, 1.6, 8), 0x7a4b2a);
-      trunk.position.set(tx, 1.3, -7.2);
-      const crown = mesh(G.sphere(1, 16, 12), 0x5cbf5a);
-      crown.position.set(tx, 2.6, -7.2);
+      const trunk = mesh(G.cyl(0.09, 0.12, 1.2, 8), 0x7a4b2a);
+      trunk.position.set(tx, 1.1, -7.2);
+      const crown = mesh(G.sphere(0.85, 16, 12), 0x5cbf5a);
+      crown.position.set(tx, 2.05, -7.2);
       crown.scale.set(1.1, 0.95, 1.1);
-      const crown2 = mesh(G.sphere(0.7, 14, 10), 0x6fd16a);
-      crown2.position.set(tx + 0.5, 2.9, -6.9);
+      const crown2 = mesh(G.sphere(0.6, 14, 10), 0x6fd16a);
+      crown2.position.set(tx + 0.45, 2.3, -6.9);
       this.scene.add(pot, trunk, crown, crown2);
     }
     for (const lx of [-8.5, 8]) {

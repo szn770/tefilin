@@ -187,6 +187,7 @@ export class Booths {
   release(s) {
     s.tag?.remove();
     s.tag = null;
+    s.ped?.tankTag?.remove();
     s.ped?.cakePiece?.removeFromParent();
     s.rig?.dispose();
     s.rig = null;

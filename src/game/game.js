@@ -241,6 +241,7 @@ export class Game {
     this.save();
     for (const p of this.peds) {
       p.tag?.remove();
+      p.tankTag?.remove();
       this.scene.remove(p.root);
     }
     this.peds = [];
@@ -450,6 +451,7 @@ export class Game {
     this.ui.setGoal(this.served, this.level.goal);
     this.addScore(gain, this.headTop(ped, 0.9));
     this.audio.sfx('success');
+    if (ped.byTank) this.ui.popupAt('🚐 בזכות הטנק!', this.headTop(ped, 1.6), 'good');
     if (T.firstTime) {
       // קרקפתא – פעם ראשונה בחיים!
       this.firsts++;

@@ -58,7 +58,8 @@ html, body {
   background: linear-gradient(90deg, #ff8a3d, #ffd36b 60%, #9be3ff);
   border: 3px solid var(--navy); border-radius: 14px; box-shadow: var(--shadow);
 }
-.sun-fill { position: absolute; inset: 0; right: auto; background: rgba(40, 20, 80, .55); border-radius: 10px; width: 0%; }
+/* השמש זזה מימין (בוקר) לשמאל (שקיעה), ומאחוריה, בצד ימין, הזמן שכבר עבר מאפיר */
+.sun-fill { position: absolute; inset: 0; left: auto; background: rgba(40, 30, 70, .45); border-radius: 10px; width: 0%; }
 .sun-icon { position: absolute; top: 50%; right: 0%; transform: translate(50%, -50%); font-size: 28px; transition: right .3s linear; }
 
 .round-btn {
@@ -183,6 +184,26 @@ html, body {
 .bubble.mendy { background: #e8f0ff; border-color: var(--navy); }
 .bubble.mendy::after { border-top-color: var(--navy); }
 .bubble.icon { padding: 2px 8px; font-size: 24px; }
+.bubble.tank { background: var(--gold); border-color: var(--navy); color: var(--navy); font-size: 17px; }
+.bubble.tank::after { border-top-color: var(--navy); }
+
+/* הטנק קורא למישהו: גל קול אליו, ותג קטן שנשאר עד שהוא מסיים להניח */
+.beam { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.beam path {
+  fill: none; stroke: var(--gold); stroke-width: 7; stroke-linecap: round; stroke-dasharray: 1 17;
+  filter: drop-shadow(0 2px 0 var(--navy));
+  animation: beam 1.4s ease-out forwards;
+}
+@keyframes beam {
+  from { stroke-dashoffset: 0; opacity: 1; }
+  70% { opacity: 1; }
+  to { stroke-dashoffset: -90; opacity: 0; }
+}
+.tag-tank {
+  font-size: 18px; line-height: 1; padding: 3px 5px;
+  background: var(--gold); border: 2px solid var(--navy); border-radius: 10px;
+  box-shadow: 0 2px 0 rgba(0,0,0,.25); animation: pop .3s cubic-bezier(.3,1.7,.5,1);
+}
 @keyframes pop { from { transform: translate(-50%, -100%) scale(.3); opacity: 0; } }
 
 @keyframes pop-btn { from { transform: scale(.4); opacity: 0; } }

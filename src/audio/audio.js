@@ -157,7 +157,12 @@ export class GameAudio {
       case 'fine': [440, 370, 311, 262].forEach((f, i) => this.tone(f, 0.18, { type: 'square', vol: 0.1, delay: i * 0.12 })); break;
       case 'flap': for (let i = 0; i < 4; i++) this.noise(0.06, { vol: 0.2, from: 900, to: 400, q: 2, delay: i * 0.07 }); break;
       case 'coo': this.tone(420, 0.25, { vol: 0.15, slide: 360 }); this.tone(380, 0.35, { vol: 0.15, delay: 0.28, slide: 320 }); break;
-      case 'horn': this.tone(330, 0.3, { type: 'square', vol: 0.12 }); this.tone(415, 0.3, { type: 'square', vol: 0.12 }); this.tone(330, 0.4, { type: 'square', vol: 0.12, delay: 0.4 }); this.tone(415, 0.4, { type: 'square', vol: 0.12, delay: 0.4 }); break;
+      case 'megaphone': // הרמקול של הטנק
+        this.tone(620, 0.1, { type: 'square', vol: 0.09 });
+        this.tone(830, 0.1, { type: 'square', vol: 0.09, delay: 0.11 });
+        this.tone(1040, 0.22, { type: 'square', vol: 0.09, delay: 0.22, slide: 980 });
+        break;
+      case 'horn':this.tone(330, 0.3, { type: 'square', vol: 0.12 }); this.tone(415, 0.3, { type: 'square', vol: 0.12 }); this.tone(330, 0.4, { type: 'square', vol: 0.12, delay: 0.4 }); this.tone(415, 0.4, { type: 'square', vol: 0.12, delay: 0.4 }); break;
       case 'nigun':
         // ניגון קצר בסולם "אהבה רבה"
         [294, 311, 370, 392, 440, 392, 370, 311, 294, 370, 440, 587].forEach((f, i) => this.tone(f, 0.32, { type: 'triangle', vol: 0.25, delay: i * 0.2 }));

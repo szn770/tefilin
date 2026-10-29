@@ -7,6 +7,7 @@ import { tween, ease } from '../engine/tween.js';
 const NIGUN_TIME = 5;
 const TANK_EVERY = [9, 6]; // לפי רמת הטנק (רמה 2: רמקול חזק)
 const CLEAN_EVERY = 5;
+const TANK_LINES = ['יהודי! בוא להניח תפילין!', 'רק דקה – מצווה גדולה!', 'תפילין ממש כאן, ליד הדוכן!', 'בוא, בוא! מחכים לך!'];
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
 
 export class Perks {
@@ -85,6 +86,21 @@ export class Perks {
     this.g.audio.sfx('whoosh');
   }
 
+  // ---------- טנק המבצעים קורא למישהו: רואים ושומעים שזה בזכותו ----------
+  tankCall(ped) {
+    const g = this.g;
+    const tank = this.tank;
+    g.ui.bubble(TANK_LINES[Math.floor(Math.random() * TANK_LINES.length)],
+      () => tank.position.clone().add(V(-0.4, 3.5, 0)), { cls: 'tank', duration: 2.2 });
+    g.ui.beam(tank.position.clone().add(V(0.6, 3, 0.3)), g.headTop(ped, 0.2));
+    g.audio.sfx('megaphone');
+    tween(0.45, (k) => { tank.position.y = Math.sin(k * Math.PI) * 0.18; });
+    g.callPed(ped, { auto: true });
+    // תג קטן ליד הראש, עד שהוא מסיים להניח
+    ped.byTank = true;
+    ped.tankTag = g.ui.addTag(() => g.headTop(ped, 0.1).add(V(0.38, 0, 0)), 'tag-tank', '🚐');
+  }
+
   // ---------- עדכון ----------
   update(dt) {
     const g = this.g;
@@ -118,8 +134,7 @@ export class Perks {
         if (cand.length && g.booths.canAccept() && !g.hazards.dirty) {
           const tx = this.tank.position.x;
           cand.sort((a, b) => Math.abs(a.root.position.x - tx) - Math.abs(b.root.position.x - tx));
-          g.ui.popupAt('📢', this.tank.position.clone().add(V(0, 3.2, 0)), 'good big');
-          g.callPed(cand[0], { auto: true });
+          this.tankCall(cand[0]);
         }
       }
     }

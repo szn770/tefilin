@@ -98,6 +98,10 @@ export class UI {
         continue;
       }
       this.place(b.el, b.anchorFn());
+      // בועה של מי שעומד בקצה המסך (למשל הטנק בטלפון) נשארת כולה בתוך המסך
+      const half = b.el.offsetWidth / 2 + 6;
+      const x = parseFloat(b.el.style.left);
+      b.el.style.left = `${Math.min(Math.max(x, half), this.canvas.clientWidth - half)}px`;
       b.el.style.opacity = Math.min(1, b.life * 4);
     }
     for (const t of this.tags) this.place(t.el, t.anchorFn());
@@ -135,6 +139,19 @@ export class UI {
   popupAt(text, world, cls = 'good') {
     const p = this.project(world);
     this.popup(text, p.x, p.y, cls);
+  }
+
+  // "גל קול" מהרמקול של הטנק אל מי שהוא קורא לו
+  beam(fromWorld, toWorld) {
+    const a = this.project(fromWorld);
+    const b = this.project(toWorld);
+    const el = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    el.setAttribute('class', 'beam');
+    const mx = (a.x + b.x) / 2;
+    const my = Math.min(a.y, b.y) - 70;
+    el.innerHTML = `<path d="M${a.x} ${a.y} Q${mx} ${my} ${b.x} ${b.y}"/>`;
+    $('popups').appendChild(el);
+    setTimeout(() => el.remove(), 1400);
   }
 
   // ---- HUD ----
