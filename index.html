@@ -53,6 +53,7 @@
         <span id="trash-val">0</span>
       </div>
       <button id="btn-mute" class="round-btn" title="שמע">🔊</button>
+      <button id="btn-pause" class="round-btn" title="הפסקה ותפריט">II</button>
     </div>
 
     <!-- כפתורי פעולה (שדרוגים) -->
@@ -86,11 +87,12 @@
         </ul>
         <button class="big-btn hidden" id="btn-continue">המשך</button>
         <button class="big-btn" id="btn-start">יאללה, מתחילים!</button>
-        <button class="link-btn hidden" id="btn-board">🏆 לוח שיאים</button>
+        <button class="link-btn board-link hidden" data-action="board">🏆 לוח שיאים</button>
         <div class="menu-footer">
-          <button class="link-btn" id="btn-contact">צור קשר · הערות והארות</button>
-          <a class="link-btn hidden" id="btn-donate" target="_blank" rel="noopener">תרומה והשתתפות</a>
+          <button class="link-btn" data-action="contact">צור קשר · הערות והארות</button>
+          <a class="link-btn hidden" data-action="donate" target="_blank" rel="noopener">תרומה והשתתפות</a>
         </div>
+        <p class="copyright">© 2026 כל הזכויות שמורות לשניאור נבון</p>
       </div>
     </div>
 
@@ -126,6 +128,22 @@
         </div>
         <div id="shop-items"></div>
         <button class="big-btn" id="btn-next">לשלב הבא ←</button>
+      </div>
+    </div>
+
+    <!-- הפסקה: התפריט באמצע המשחק -->
+    <div id="screen-pause" class="screen hidden">
+      <div class="card pause">
+        <div class="logo small">הפסקה קצרה</div>
+        <button class="big-btn" id="btn-resume">ממשיכים לשחק ▶</button>
+        <button class="link-btn board-link hidden" data-action="board">🏆 לוח שיאים</button>
+        <button class="link-btn" id="btn-home">🏠 למסך הפתיחה</button>
+        <small class="pause-note">השלב הנוכחי יתחיל מחדש. מה שקנית בחנות נשמר.</small>
+        <div class="menu-footer">
+          <button class="link-btn" data-action="contact">צור קשר · הערות והארות</button>
+          <a class="link-btn hidden" data-action="donate" target="_blank" rel="noopener">תרומה והשתתפות</a>
+        </div>
+        <p class="copyright">© 2026 כל הזכויות שמורות לשניאור נבון</p>
       </div>
     </div>
 

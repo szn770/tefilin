@@ -1,6 +1,7 @@
 import { CONTACT_KEY, DONATE_URL } from '../data/links.js';
 
 const $ = (id) => document.getElementById(id);
+const all = (action) => document.querySelectorAll(`[data-action="${action}"]`);
 const GAME_NAME = 'הנחת?! – מבצע תפילין';
 
 // מה נשלח ל-Web3Forms. null כשמלכודת הבוטים מסומנת: מודים לו ולא שולחים כלום.
@@ -18,22 +19,26 @@ export function contactPayload(data, key = CONTACT_KEY) {
   };
 }
 
-// "תרומה והשתתפות" ו"צור קשר" בתחתית מסך הפתיחה
+// "תרומה והשתתפות" ו"צור קשר": במסך הפתיחה ובתפריט ההפסקה
 export class ContactUI {
   constructor({ key = CONTACT_KEY, donateUrl = DONATE_URL } = {}) {
     this.key = key;
     if (donateUrl) {
-      $('btn-donate').href = donateUrl;
-      $('btn-donate').classList.remove('hidden');
+      for (const a of all('donate')) {
+        a.href = donateUrl;
+        a.classList.remove('hidden');
+      }
     }
     if (!key) {
-      $('btn-contact').classList.add('hidden');
+      for (const b of all('contact')) b.classList.add('hidden');
       return;
     }
-    $('btn-contact').onclick = () => {
-      $('contact-status').textContent = '';
-      $('screen-contact').classList.remove('hidden');
-    };
+    for (const b of all('contact')) {
+      b.onclick = () => {
+        $('contact-status').textContent = '';
+        $('screen-contact').classList.remove('hidden');
+      };
+    }
     $('btn-contact-back').onclick = () => $('screen-contact').classList.add('hidden');
     $('contact-form').onsubmit = (e) => this.send(e);
   }

@@ -22,8 +22,10 @@ export class OnlineUI {
     this.pending = null; // תוצאת השלב האחרון, שתישלח אחרי הרשמה ממסך סוף השלב
     if (!enabled) return;
 
-    $('btn-board').classList.remove('hidden');
-    $('btn-board').onclick = () => this.openBoard();
+    for (const b of document.querySelectorAll('[data-action="board"]')) {
+      b.classList.remove('hidden');
+      b.onclick = () => this.openBoard();
+    }
     $('btn-board-close').onclick = () => $('screen-board').classList.add('hidden');
     $('btn-auth-close').onclick = () => this.closeAuth();
     for (const tab of document.querySelectorAll('.auth-tab')) tab.onclick = () => this.setAuthMode(tab.dataset.mode);

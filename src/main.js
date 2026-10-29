@@ -73,15 +73,35 @@ async function boot() {
   };
   document.getElementById('btn-nigun').onclick = () => game.perks.useNigun();
   document.getElementById('btn-flyers').onclick = () => game.perks.useFlyers();
+  // בלי זה, ב-iPhone הכפתורים לא נראים לחוצים כשנוגעים בהם
+  document.addEventListener('touchstart', () => {}, { passive: true });
+
+  // ---- הפסקה: התפריט באמצע המשחק. הכול קופא, גם השמש והשעון ----
+  let paused = false;
+  const setPaused = (on) => {
+    paused = on;
+    document.getElementById('screen-pause').classList.toggle('hidden', !on);
+    if (audio.ctx) (on ? audio.ctx.suspend() : audio.ctx.resume()).catch(() => {});
+  };
+  document.getElementById('btn-pause').onclick = () => setPaused(true);
+  document.getElementById('btn-resume').onclick = () => setPaused(false);
+  // ההתקדמות נשמרת בסוף כל שלב, ולכן במסך הפתיחה אפשר להמשיך מתחילת השלב הנוכחי
+  document.getElementById('btn-home').onclick = () => { location.href = location.pathname; };
+  // מי שעובר ללשונית או לאפליקציה אחרת באמצע שלב, חוזר למשחק עצור
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && game.state === 'day') setPaused(true);
+  });
 
   // ---- לולאה ----
   const clock = new THREE.Clock();
   const frame = (dt) => {
-    updateTweens(dt);
-    game.update(dt);
-    world.update(dt);
-    fx.update(dt);
-    ui.update(dt);
+    if (!paused) {
+      updateTweens(dt);
+      game.update(dt);
+      world.update(dt);
+      fx.update(dt);
+    }
+    ui.update(paused ? 0 : dt);
     renderer.render(scene, camera);
   };
   renderer.setAnimationLoop(() => frame(Math.min(clock.getDelta(), 1 / 20)));
