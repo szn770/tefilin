@@ -42,6 +42,7 @@ async function boot() {
 
   function resize() {
     const w = window.innerWidth, h = window.innerHeight;
+    if (!w || !h) return; // חלון מוסתר בלי גודל: מחכים לגודל אמיתי, אחרת כל המיקומים נהיים NaN
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     // במסך צר (נייד לאורך) מרחיקים מעט את השדה
