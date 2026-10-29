@@ -86,6 +86,11 @@
         </ul>
         <button class="big-btn hidden" id="btn-continue">המשך</button>
         <button class="big-btn" id="btn-start">יאללה, מתחילים!</button>
+        <button class="link-btn hidden" id="btn-board">🏆 לוח שיאים</button>
+        <div class="menu-footer">
+          <button class="link-btn" id="btn-contact">צור קשר · הערות והארות</button>
+          <a class="link-btn hidden" id="btn-donate" target="_blank" rel="noopener">תרומה והשתתפות</a>
+        </div>
       </div>
     </div>
 
@@ -112,6 +117,7 @@
         <div class="logo small" id="result-title"></div>
         <div class="result-stars" id="result-stars"></div>
         <div class="end-stats" id="shop-summary"></div>
+        <div class="result-online hidden" id="result-online"></div>
         <div class="shop-head">חנות הדוכן · יש לך <b>💛 <span id="shop-score">0</span></b></div>
         <div class="shop-tabs">
           <button class="shop-tab" data-cat="stand">🏪 דוכן <i></i></button>
@@ -120,6 +126,72 @@
         </div>
         <div id="shop-items"></div>
         <button class="big-btn" id="btn-next">לשלב הבא ←</button>
+      </div>
+    </div>
+
+    <!-- לוח השיאים -->
+    <div id="screen-board" class="screen hidden">
+      <div class="card board">
+        <div class="logo small">🏆 לוח השיאים</div>
+        <div class="board-sub">מי הניח הכי הרבה תפילין?</div>
+        <ol class="board-list" id="board-list"></ol>
+        <div class="board-me hidden" id="board-me"></div>
+        <div class="board-account" id="board-account"></div>
+        <button class="big-btn" id="btn-board-close">סגור</button>
+      </div>
+    </div>
+
+    <!-- צור קשר -->
+    <div id="screen-contact" class="screen hidden">
+      <div class="card contact">
+        <div class="logo small">צור קשר</div>
+        <div class="board-sub">הערות, רעיונות, תקלות או רצון להצטרף לפיתוח – נשמח לשמוע!</div>
+        <form id="contact-form" class="contact-form">
+          <input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" hidden />
+          <label for="contact-name">שם (לא חובה)</label>
+          <input id="contact-name" name="name" maxlength="40" autocomplete="name" />
+          <label for="contact-email">אימייל לתשובה (לא חובה)</label>
+          <input id="contact-email" name="email" type="email" maxlength="80" autocomplete="email" dir="ltr" />
+          <label for="contact-topic">נושא</label>
+          <select id="contact-topic" name="topic">
+            <option>הערה</option>
+            <option>רעיון / הארה</option>
+            <option>תקלה במשחק</option>
+            <option>שותפות בפיתוח</option>
+            <option>אחר</option>
+          </select>
+          <label for="contact-msg">ההודעה</label>
+          <textarea id="contact-msg" name="message" rows="4" maxlength="1500" required></textarea>
+          <p id="contact-status" class="contact-status" aria-live="polite"></p>
+          <button id="contact-send" type="submit" class="big-btn">שליחה</button>
+        </form>
+        <button class="link-btn" id="btn-contact-back">חזרה</button>
+      </div>
+    </div>
+
+    <!-- הרשמה וכניסה -->
+    <div id="screen-auth" class="screen hidden">
+      <div class="card auth">
+        <div class="logo small">🏆 לוח השיאים</div>
+        <div class="auth-tabs">
+          <button class="auth-tab active" data-mode="signup">הרשמה</button>
+          <button class="auth-tab" data-mode="signin">כניסה</button>
+        </div>
+        <form id="auth-form" novalidate>
+          <label class="auth-field">כינוי
+            <input id="auth-nick" type="text" autocomplete="username" maxlength="20" spellcheck="false" />
+          </label>
+          <label class="auth-field">סיסמה
+            <span class="auth-pass">
+              <input id="auth-pass" type="password" autocomplete="new-password" />
+              <button type="button" id="auth-eye" title="הצגת הסיסמה">👁️</button>
+            </span>
+          </label>
+          <div class="auth-hint" id="auth-hint"></div>
+          <div class="auth-error" id="auth-error" role="alert"></div>
+          <button class="big-btn" type="submit" id="auth-submit">להירשם</button>
+        </form>
+        <button class="link-btn" id="btn-auth-close">ביטול</button>
       </div>
     </div>
   </div>

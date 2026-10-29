@@ -8,12 +8,19 @@
     "build": "vite build",
     "preview": "vite preview",
     "voices": "node tools/generate-voices.mjs",
-    "voices:list": "node tools/generate-voices.mjs --list-voices"
+    "voices:list": "node tools/generate-voices.mjs --list-voices",
+    "test": "vitest run tests/unit",
+    "db:migrate": "node tools/db-migrate.mjs",
+    "test:db": "vitest run tests/db --no-file-parallelism",
+    "test:online": "node tools/online-check.mjs"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.118.0",
     "three": "^0.186.1"
   },
   "devDependencies": {
-    "vite": "^8.3.5"
+    "pg": "^8.23.1",
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5"
   }
 }

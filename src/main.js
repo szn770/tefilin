@@ -6,6 +6,8 @@ import { GameAudio } from './audio/audio.js';
 import { FX } from './engine/fx.js';
 import { updateTweens } from './engine/tween.js';
 import { Game } from './game/game.js';
+import { OnlineUI } from './ui/online-ui.js';
+import { ContactUI } from './ui/contact.js';
 
 async function boot() {
   // הפונטים חייבים להיטען לפני שמציירים שלטים בעברית על קנבס
@@ -34,6 +36,9 @@ async function boot() {
   const audio = new GameAudio();
   const fx = new FX(scene);
   const game = new Game({ scene, camera, ui, audio, world, fx, canvas });
+  const online = new OnlineUI();
+  game.onLevelEnd = (result) => online.levelEnded(result);
+  new ContactUI();
 
   function resize() {
     const w = window.innerWidth, h = window.innerHeight;

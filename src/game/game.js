@@ -241,6 +241,7 @@ export class Game {
     if (this.wrongs) lines.push(`🙅 ${this.wrongs} קריאות בטעות`);
     if (this.fines) lines.push(`📋 ${this.fines} קנסות`);
     if (failed) lines.unshift('💔 נגמרו הלבבות – זהירות עם קריאות בטעות ועם הפקח!');
+    this.onLevelEnd?.({ levelIndex: L.index, served: this.served }); // לוח השיאים
     await this.ui.showResults({
       title: passed ? `שלב ${L.number} – הצלחה!` : failed ? 'אוי, נגמרו הלבבות' : 'כמעט! ננסה שוב?',
       stars,
