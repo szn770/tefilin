@@ -75,6 +75,20 @@ export class GameAudio {
 
   hasRecorded(name) { return this.available.has(name); }
 
+  // מנגן הקלטה פעם אחת. כשאין הקלטה כזו (או שהיא לא נטענה) מנגנים את fallback
+  play(key, fallback, gain = 1) {
+    if (!this.available.has(key)) return fallback();
+    this.load(key).then((buf) => {
+      if (!buf) return fallback();
+      const src = this.ctx.createBufferSource();
+      src.buffer = buf;
+      const g = this.ctx.createGain();
+      g.gain.value = gain;
+      src.connect(g).connect(this.sfxBus);
+      src.start();
+    });
+  }
+
   async loop(key, gain = 0.25) {
     if (!this.ctx || !this.available.has(key)) return;
     const buf = await this.load(key);
@@ -164,8 +178,10 @@ export class GameAudio {
         break;
       case 'horn':this.tone(330, 0.3, { type: 'square', vol: 0.12 }); this.tone(415, 0.3, { type: 'square', vol: 0.12 }); this.tone(330, 0.4, { type: 'square', vol: 0.12, delay: 0.4 }); this.tone(415, 0.4, { type: 'square', vol: 0.12, delay: 0.4 }); break;
       case 'nigun':
-        // ניגון קצר בסולם "אהבה רבה"
-        [294, 311, 370, 392, 440, 392, 370, 311, 294, 370, 440, 587].forEach((f, i) => this.tone(f, 0.32, { type: 'triangle', vol: 0.25, delay: i * 0.2 }));
+        // public/audio/sfx/nigun.mp3 – באורך ההאטה (5 שניות). בלעדיו: ניגון קצר בסולם "אהבה רבה"
+        this.play('sfx/nigun', () => {
+          [294, 311, 370, 392, 440, 392, 370, 311, 294, 370, 440, 587].forEach((f, i) => this.tone(f, 0.32, { type: 'triangle', vol: 0.25, delay: i * 0.2 }));
+        });
         break;
     }
   }
