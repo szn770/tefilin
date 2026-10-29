@@ -77,8 +77,8 @@ export function shopCatalog(state) {
     make('outreach', 'sign', '🪧', 'שילוט גדול', sign ? `לחיצה פחות ל${sign.text}` : 'כל השלטים כבר תלויים', lvl('sign'),
       { locked: sign ? lockedUntil(sign.needs) : null }),
     {
-      cat: 'outreach', key: 'flyers', icon: '📄', title: `חומרי הסברה – ${FLYER_PACK} חבילות עלונים`,
-      desc: 'כפתור במשחק: כל הממהרים במסך צריכים רק לחיצה אחת',
+      cat: 'outreach', key: 'flyers', icon: '📄', title: `עלונים לממהרים – ${FLYER_PACK} חלוקות`,
+      desc: 'כפתור 📄 במשחק: כל הממהרים שבמסך (📱 ⭐ ⏰) עוצרים לקרוא, ומספיקה להם לחיצה אחת',
       level: `יש ${u.flyers}`, cost: FLYER_COST, maxed: flyersFull, locked: null,
       can: !flyersFull && score >= FLYER_COST,
     },

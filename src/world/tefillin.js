@@ -207,3 +207,25 @@ export class TefillinRig {
     this.p.setPose('normal');
   }
 }
+
+// ---- סמן מטרה פועם (בהדרכה: לאן גוררים / על מה לוחצים) ----
+export function createTarget(radius = 0.06) {
+  const g = new THREE.Group();
+  const ring = new THREE.Mesh(
+    new THREE.RingGeometry(radius * 0.75, radius, 32),
+    new THREE.MeshBasicMaterial({ color: 0xffd23f, transparent: true, opacity: 0.95, depthTest: false }),
+  );
+  const dot = new THREE.Mesh(
+    new THREE.CircleGeometry(radius * 0.7, 32),
+    new THREE.MeshBasicMaterial({ color: 0xffef9f, transparent: true, opacity: 0.35, depthTest: false }),
+  );
+  g.add(ring, dot);
+  g.renderOrder = ring.renderOrder = dot.renderOrder = 10;
+  g.userData.t = 0;
+  g.userData.update = (dt, camera) => {
+    g.userData.t += dt;
+    g.scale.setScalar(1 + Math.sin(g.userData.t * 6) * 0.15);
+    if (camera) g.quaternion.copy(camera.quaternion);
+  };
+  return g;
+}

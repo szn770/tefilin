@@ -61,10 +61,23 @@
       <span class="nigun-fill" id="nigun-fill"></span>
       <span class="nigun-ico">🎵</span>
     </button>
-    <button id="btn-flyers" class="hidden" title="עלונים – הממהרים במסך צריכים רק לחיצה אחת">
+    <button id="btn-flyers" class="hidden" title="עלונים – כל הממהרים שבמסך עוצרים לקרוא, ומספיקה להם לחיצה אחת">
       <span class="nigun-ico">📄</span>
       <b id="flyers-val">0</b>
     </button>
+
+    <!-- הדרכה: יציאה, כפתורי בחירה, מילים להקשה וטבעת לכריכות -->
+    <button id="btn-learn-exit" class="round-btn hidden" title="יציאה מההדרכה">🏠</button>
+    <div id="choices"></div>
+    <div id="karaoke" class="hidden"></div>
+    <div id="ring-guide" class="hidden">
+      <svg viewBox="0 0 200 200">
+        <circle cx="100" cy="100" r="80" class="ring-bg" />
+        <circle cx="100" cy="100" r="80" class="ring-progress" id="ring-progress" />
+        <g class="ring-arrow"><path d="M100 14 l14 8 l-14 8 z" /></g>
+      </svg>
+      <div class="ring-count" id="ring-count">0/7</div>
+    </div>
 
     <div id="banner" class="hidden">
       <div class="banner-step" id="banner-step"></div>
@@ -87,12 +100,24 @@
         </ul>
         <button class="big-btn hidden" id="btn-continue">המשך</button>
         <button class="big-btn" id="btn-start">יאללה, מתחילים!</button>
+        <button class="learn-btn" id="btn-learn"><span>📿</span> לומדים להניח תפילין <small>הדרכה צעד אחר צעד</small></button>
         <button class="link-btn board-link hidden" data-action="board">🏆 לוח שיאים</button>
         <div class="menu-footer">
           <button class="link-btn" data-action="contact">צור קשר · הערות והארות</button>
           <a class="link-btn hidden" data-action="donate" target="_blank" rel="noopener">תרומה והשתתפות</a>
         </div>
         <p class="copyright">© 2026 כל הזכויות שמורות לשניאור נבון</p>
+      </div>
+    </div>
+
+    <!-- סוף ההדרכה -->
+    <div id="screen-learned" class="screen hidden">
+      <div class="card intro">
+        <div class="logo small">כל הכבוד! 🎉</div>
+        <div class="result-stars" id="learned-stars"></div>
+        <div class="end-stats" id="learned-text"></div>
+        <button class="big-btn" id="btn-learn-again">עוד פעם 🔁</button>
+        <button class="link-btn" id="btn-learn-home">🏠 למסך הפתיחה</button>
       </div>
     </div>
 

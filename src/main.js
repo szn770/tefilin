@@ -6,6 +6,7 @@ import { GameAudio } from './audio/audio.js';
 import { FX } from './engine/fx.js';
 import { updateTweens } from './engine/tween.js';
 import { Game } from './game/game.js';
+import { Training } from './game/training.js';
 import { OnlineUI } from './ui/online-ui.js';
 import { ContactUI } from './ui/contact.js';
 
@@ -122,15 +123,17 @@ async function boot() {
     clock.getDelta();
   };
 
-  // ?quick – דילוג על מסך הפתיחה, ?level=N – קפיצה לשלב (לפיתוח)
+  // ?quick – דילוג על מסך הפתיחה, ?level=N – קפיצה לשלב, ?learn – ישר להדרכה (לפיתוח)
   const params = new URLSearchParams(location.search);
   const started = ui.waitStart(game.hasSave ? game.levelIndex + 1 : 0);
-  if (params.has('quick')) document.getElementById(game.hasSave ? 'btn-continue' : 'btn-start').click();
+  if (params.has('learn')) document.getElementById('btn-learn').click();
+  else if (params.has('quick')) document.getElementById(game.hasSave ? 'btn-continue' : 'btn-start').click();
   const choice = await started;
   if (choice === 'new' && game.hasSave) return game.resetProgress();
   await audio.init();
   audio.loop('sfx/street', 0.35);
   audio.loop('music/theme', 0.5);
+  if (choice === 'learn') return new Training(game).start();
   const jump = parseInt(params.get('level'), 10);
   game.beginLevel(Number.isFinite(jump) ? jump - 1 : game.levelIndex);
 }

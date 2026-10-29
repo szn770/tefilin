@@ -7,6 +7,7 @@ import { tween, ease } from '../engine/tween.js';
 const NIGUN_TIME = 5; // שניות של האטה. הקטע public/audio/sfx/nigun.mp3 באותו אורך – משנים את שניהם יחד
 const TANK_EVERY = [9, 6]; // לפי רמת הטנק (רמה 2: רמקול חזק)
 const CLEAN_EVERY = 5;
+export const READ_TIME = 4; // שניות שממהר הולך לאט וקורא את העלון שקיבל
 const TANK_LINES = ['יהודי! בוא להניח תפילין!', 'רק דקה – מצווה גדולה!', 'תפילין ממש כאן, ליד הדוכן!', 'בוא, בוא! מחכים לך!'];
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
 
@@ -68,22 +69,37 @@ export class Perks {
     this.g.ui.banner('🎵 ניגון!', 'כולם עוצרים להקשיב...', 1.6);
   }
 
-  // ---------- עלונים: מי שבמסך צריך רק לחיצה אחת ----------
+  // ---------- עלונים: הממהרים שבמסך עוצרים לקרוא, ומספיקה להם לחיצה אחת ----------
+  // מי שהעלונים יעזרו לו עכשיו: ממהרים שעל המסך שצריכים יותר מלחיצה אחת
+  flyerTargets() {
+    const { left, right } = this.g.edges();
+    return this.g.peds.filter((p) => p.mode === 'walk' && !p.called && !p.penalized && !p.data.type.penalty
+      && p.tapsLeft > 1 && p.root.position.x > left + 0.5 && p.root.position.x < right - 0.5);
+  }
+
   useFlyers() {
-    if (this.u.flyers <= 0 || this.g.state !== 'day') return;
-    const targets = this.g.peds.filter((p) => p.mode === 'walk' && !p.called && !p.penalized && !p.data.type.penalty && p.tapsLeft > 1);
+    const g = this.g;
+    if (this.u.flyers <= 0 || g.state !== 'day') return;
+    const targets = this.flyerTargets();
     if (!targets.length) {
-      this.g.ui.banner('📄 אין למי לחלק', 'חכו שיעברו אנשים ממהרים', 1.4);
+      g.ui.banner('📄 אין למי לחלק', 'העלונים עוזרים כשיש במסך ממהרים 📱 ⭐ ⏰', 1.8);
       return;
     }
     this.u.flyers--;
-    this.g.save();
+    g.save();
+    const from = g.headTop(g.mendy, 0.2);
     for (const p of targets) {
       p.tapsLeft = 1;
-      p.tag?.set('1');
-      this.g.ui.popupAt('📄', this.g.headTop(p, 0.9), 'good');
+      p.readLeft = READ_TIME;
+      if (p.tag) {
+        p.tag.el.querySelector('span').textContent = '📄';
+        p.tag.set(1);
+      }
+      g.ui.beam(from, g.headTop(p, 0.2));
+      g.ui.popupAt('📄', g.headTop(p, 0.9), 'good');
     }
-    this.g.audio.sfx('whoosh');
+    g.ui.banner('📄 עלונים!', `${targets.length === 1 ? 'הממהר עוצר' : `${targets.length} ממהרים עוצרים`} לקרוא – עכשיו מספיקה לחיצה אחת`, 1.8);
+    g.audio.sfx('whoosh');
   }
 
   // ---------- טנק המבצעים קורא למישהו: רואים ושומעים שזה בזכותו ----------
@@ -140,6 +156,12 @@ export class Perks {
     }
 
     g.ui.setNigun(this.u.speaker > 0, 1 - this.nigunCooldown / this.nigunCooldownMax(), this.nigunLeft > 0);
-    g.ui.setFlyers(this.u.flyers);
+    // כפתור העלונים פועם כשיש כמה ממהרים במסך, ובפעם הראשונה גם מסבירים למה
+    const readers = active && this.u.flyers > 0 ? this.flyerTargets().length : 0;
+    g.ui.setFlyers(this.u.flyers, readers);
+    if (readers >= 2 && !this.flyerHintShown) {
+      this.flyerHintShown = true;
+      g.ui.banner('📄 עכשיו זה הזמן לעלונים!', 'יש כמה ממהרים במסך – לחצו על 📄 וכולם יעצרו לקרוא', 2.6);
+    }
   }
 }

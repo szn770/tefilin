@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { TEFILLIN_ICON, TEFILLIN_SHAPES } from './icons.js';
+import { wait } from '../engine/tween.js';
 
 const $ = (id) => document.getElementById(id);
 const tmp = new THREE.Vector3();
@@ -140,6 +141,80 @@ export class UI {
     const p = this.project(world);
     this.popup(text, p.x, p.y, cls);
   }
+  popupCenter(text, cls = 'good big') {
+    const r = this.canvas.getBoundingClientRect();
+    this.popup(text, r.width / 2, r.height * 0.42, cls);
+  }
+
+  // ---- כלים להדרכה ----
+  // כפתורי בחירה בתחתית המסך. list: [{label}], מחזיר את מה שנבחר
+  choices(list) {
+    const box = $('choices');
+    box.innerHTML = '';
+    const shuffled = [...list].sort(() => Math.random() - 0.5);
+    return new Promise((resolve) => {
+      for (const c of shuffled) {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        btn.textContent = c.label;
+        btn.onclick = () => {
+          box.innerHTML = '';
+          resolve(c);
+        };
+        box.appendChild(btn);
+      }
+    });
+  }
+
+  // מילים שמקישים עליהן לפי הסדר (ברכה / שמע ישראל). onWord(i, ok)
+  karaoke(words, onWord) {
+    const box = $('karaoke');
+    box.innerHTML = '';
+    box.classList.remove('hidden');
+    let idx = 0;
+    const els = words.map((w, i) => {
+      const el = document.createElement('div');
+      el.className = 'word' + (i === 0 ? ' active' : '');
+      el.textContent = w;
+      box.appendChild(el);
+      return el;
+    });
+    return new Promise((resolve) => {
+      els.forEach((el, i) => {
+        el.onpointerdown = () => {
+          if (i !== idx) return onWord?.(i, false);
+          el.classList.replace('active', 'done');
+          onWord?.(i, true);
+          idx++;
+          if (idx < els.length) els[idx].classList.add('active');
+          else wait(0.35).then(() => { box.classList.add('hidden'); resolve(); });
+        };
+      });
+    });
+  }
+
+  // טבעת שמראה כמה סיבובים כבר עשו (כריכות)
+  showRing(x, y, count, total) {
+    const el = $('ring-guide');
+    el.classList.remove('hidden');
+    this.moveRing(x, y);
+    this.setRing(0, count, total);
+  }
+  moveRing(x, y) {
+    $('ring-guide').style.left = `${x}px`;
+    $('ring-guide').style.top = `${y}px`;
+  }
+  setRing(frac, count, total) {
+    $('ring-progress').style.strokeDashoffset = `${503 * (1 - frac)}`;
+    $('ring-count').textContent = `${count}/${total}`;
+  }
+  hideRing() { $('ring-guide').classList.add('hidden'); }
+
+  clearTraining() {
+    $('choices').innerHTML = '';
+    $('karaoke').classList.add('hidden');
+    this.hideRing();
+  }
 
   // "גל קול" מהרמקול של הטנק אל מי שהוא קורא לו
   beam(fromWorld, toWorld) {
@@ -185,9 +260,12 @@ export class UI {
     el.classList.toggle('low', n <= 1);
     bump(el);
   }
-  setFlyers(count) {
+  // readers = כמה ממהרים במסך יעצרו לקרוא עכשיו. מ-2 הכפתור פועם, ובלי אף אחד הוא דהוי
+  setFlyers(count, readers = 0) {
     const btn = $('btn-flyers');
     btn.classList.toggle('hidden', count <= 0);
+    btn.classList.toggle('ready', readers >= 2);
+    btn.classList.toggle('idle', readers === 0);
     $('flyers-val').textContent = count;
   }
   setTrash(count, dirty) {
@@ -213,7 +291,7 @@ export class UI {
   }
 
   // ---- מסכים ----
-  // מחזיר 'continue' או 'new'
+  // מחזיר 'continue', 'new' או 'learn' (הדרכה)
   waitStart(savedLevel) {
     const cont = $('btn-continue');
     cont.classList.toggle('hidden', !savedLevel);
@@ -227,6 +305,7 @@ export class UI {
       };
       $('btn-start').onclick = () => done('new');
       cont.onclick = () => done('continue');
+      $('btn-learn').onclick = () => done('learn');
     });
   }
 
@@ -245,6 +324,22 @@ export class UI {
         screen.classList.add('hidden');
         resolve();
       };
+    });
+  }
+
+  // סוף ההדרכה. מחזיר 'again' או 'home'
+  showLearned(stars, text) {
+    $('learned-stars').innerHTML = [0, 1, 2].map((i) => `<span class="${i < stars ? 'on' : ''}" style="animation-delay:${0.2 + i * 0.25}s">★</span>`).join('');
+    $('learned-text').innerHTML = text;
+    const screen = $('screen-learned');
+    screen.classList.remove('hidden');
+    return new Promise((resolve) => {
+      const done = (choice) => {
+        screen.classList.add('hidden');
+        resolve(choice);
+      };
+      $('btn-learn-again').onclick = () => done('again');
+      $('btn-learn-home').onclick = () => done('home');
     });
   }
 

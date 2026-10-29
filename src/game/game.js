@@ -56,6 +56,8 @@ export class Game {
     this.state = 'menu';
     this.time = 0;
     this.slowFactor = 1;
+    this.input = null; // בהדרכה: מה עושה לחיצה בשלב הנוכחי
+    this.training = null;
 
     this.mendy = new Person(MENDY_LOOK, { isMendy: true });
     this.scene.add(this.mendy.root);
@@ -114,6 +116,7 @@ export class Game {
 
   // ---------- מצלמה: מתרחקת כשיש עוד דוכנים ----------
   frameCamera(snap = false) {
+    if (this.training) return; // בהדרכה המצלמה עוקבת אחרי השלבים
     const xs = this.booths.allSpots.map((s) => s.pos.x).concat(this.booths.booths.flatMap((b) => [b.x - 1.3, b.x + 1.3]));
     const min = Math.min(...xs), max = Math.max(...xs);
     const cx = (min + max) / 2;
@@ -505,8 +508,10 @@ export class Game {
     return best;
   }
 
+  // בהדרכה, כל שלב קובע בעצמו מה עושה לחיצה (this.input)
   onDown(p) {
     this.audio.init();
+    if (this.input?.down) return this.input.down(p);
     if (this.state !== 'day') return;
     const hz = this.hazards.pick(p);
     if (hz) return this.hazards.handle(hz);
@@ -514,9 +519,10 @@ export class Game {
     if (ped) this.tapPed(ped);
   }
   onMove(p) {
+    if (this.input?.move) return this.input.move(p);
     if (this.state === 'day') this.canvas.style.cursor = this.hazards.pick(p) || this.pickPed(p) ? 'pointer' : 'default';
   }
-  onUp() {}
+  onUp(p) { this.input?.up?.(p); }
 
   // ---------- לולאה ----------
   update(dt) {
@@ -546,7 +552,9 @@ export class Game {
     for (let i = this.peds.length - 1; i >= 0; i--) {
       const p = this.peds[i];
       if (p.mode === 'walk') {
-        p.root.position.x += p.dir * p.speed * this.slowFactor * dt;
+        if (p.readLeft > 0) p.readLeft -= dt;
+        const reading = p.readLeft > 0 ? 0.3 : 1; // ממהר שקיבל עלון הולך לאט וקורא
+        p.root.position.x += p.dir * p.speed * this.slowFactor * reading * dt;
         const x = p.root.position.x;
         if ((p.dir > 0 && x > right + 0.5) || (p.dir < 0 && x < left - 0.5)) {
           if (!p.called && !p.penalized && !p.data.type.penalty && this.state === 'day') this.missed++;
@@ -574,6 +582,7 @@ export class Game {
     }
 
     this.mendy.update(dt);
+    this.training?.update(dt);
     this.rig.update(dt);
   }
 }

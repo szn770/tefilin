@@ -105,6 +105,8 @@ html, body {
   border: 4px solid var(--navy); background: #fff3c4; cursor: pointer; box-shadow: var(--shadow); padding: 0;
 }
 #btn-nigun.hidden + #btn-flyers { left: 18px; }
+#btn-flyers.ready { background: #ffe066; animation: pulse-btn 1s ease-in-out infinite; }
+#btn-flyers.idle { filter: grayscale(.7); opacity: .7; }
 #btn-flyers b {
   position: absolute; top: -6px; right: -6px; background: #e76f51; color: #fff; border-radius: 12px;
   font-family: 'Secular One'; font-size: 16px; min-width: 24px; height: 24px; line-height: 24px; border: 2px solid #fff;
@@ -207,6 +209,65 @@ html, body {
 @keyframes pop { from { transform: translate(-50%, -100%) scale(.3); opacity: 0; } }
 
 @keyframes pop-btn { from { transform: scale(.4); opacity: 0; } }
+
+/* ---------- הדרכה: כפתורי בחירה, מילים להקשה, טבעת כריכות ---------- */
+#btn-learn-exit { left: 12px; top: 12px; }
+#choices {
+  position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;
+  width: calc(100vw - 32px);
+}
+.choice-btn {
+  font-family: 'Rubik'; font-weight: 700; font-size: 20px;
+  padding: 14px 22px; border-radius: 18px; cursor: pointer;
+  background: var(--gold); color: var(--ink); border: 3px solid var(--ink);
+  box-shadow: 0 6px 0 var(--gold-dark); max-width: 420px;
+  animation: pop-btn .3s cubic-bezier(.3,1.7,.5,1) backwards;
+}
+.choice-btn:nth-child(2) { animation-delay: .08s; background: #9be3ff; box-shadow: 0 6px 0 #4aa8d8; }
+.choice-btn:nth-child(3) { animation-delay: .16s; background: #c7f59c; box-shadow: 0 6px 0 #79c043; }
+#karaoke {
+  position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+  width: calc(100vw - 32px); max-width: 900px;
+  background: rgba(255, 248, 231, .95); border: 3px solid var(--navy);
+  border-radius: 22px; padding: 14px; box-shadow: var(--shadow);
+}
+.word {
+  font-family: 'Secular One'; font-size: 30px; padding: 6px 14px;
+  border-radius: 14px; background: #e6e2d6; color: #9a927f; cursor: pointer;
+  border: 3px solid transparent; transition: transform .15s;
+}
+.word.active { background: var(--gold); color: var(--ink); border-color: var(--ink); animation: pulse 0.8s ease-in-out infinite; }
+.word.done { background: var(--green); color: #fff; }
+@keyframes pulse { 50% { transform: scale(1.12); } }
+#ring-guide {
+  position: absolute; width: 220px; height: 220px; transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+#ring-guide svg { width: 100%; height: 100%; overflow: visible; }
+.ring-bg { fill: none; stroke: rgba(255,255,255,.55); stroke-width: 14; stroke-dasharray: 10 12; }
+.ring-progress {
+  fill: none; stroke: var(--gold); stroke-width: 14; stroke-linecap: round;
+  transform: rotate(-90deg); transform-origin: 100px 100px;
+  stroke-dasharray: 503; stroke-dashoffset: 503;
+}
+.ring-arrow { fill: #fff; transform-origin: 100px 100px; animation: spin 1.6s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.ring-count {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  font-family: 'Secular One'; font-size: 38px; color: #fff;
+  text-shadow: 0 3px 0 var(--navy), 0 0 8px rgba(0,0,0,.4);
+}
+/* כפתור ההדרכה במסך הפתיחה */
+.learn-btn {
+  display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 0 8px;
+  margin: 14px auto 0; padding: 10px 22px; border-radius: 18px; cursor: pointer;
+  font-family: 'Secular One'; font-size: 22px; color: var(--navy);
+  background: #dff3ff; border: 3px solid var(--navy); box-shadow: 0 5px 0 #8fb8d8;
+}
+.learn-btn span { font-size: 26px; line-height: 1.1; }
+.learn-btn small { flex-basis: 100%; font-family: 'Rubik'; font-size: 14px; opacity: .75; }
 
 /* ---------- Popups ---------- */
 #popups { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
@@ -401,6 +462,18 @@ input, textarea, select { user-select: text; -webkit-user-select: text; touch-ac
   .banner-step { font-size: 20px; }
   .banner-hint { font-size: 14px; }
   .logo { font-size: 64px; }
-  .rules { font-size: 15px; }
+  .rules { font-size: 15px; margin: 10px 0 12px; line-height: 1.4; }
+  .rules li { margin: 3px 0; }
+  .subtitle { margin-top: 4px; }
   .card { padding: 22px 18px; }
+  .learn-btn { font-size: 18px; line-height: 1.2; padding: 6px 16px; margin-top: 10px; }
+  .learn-btn span { font-size: 20px; }
+  .learn-btn small { display: none; }
+  #screen-start .board-link { margin-top: 8px; }
+  #screen-start .menu-footer { margin-top: 4px; }
+  .word { font-size: 22px; padding: 4px 10px; }
+  #karaoke { gap: 6px; padding: 10px; bottom: 18px; }
+  .choice-btn { font-size: 17px; padding: 12px 16px; }
+  #ring-guide { width: 170px; height: 170px; }
+  .ring-count { font-size: 30px; }
 }
