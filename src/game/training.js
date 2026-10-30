@@ -5,6 +5,7 @@ import { tween, wait, ease } from '../engine/tween.js';
 import { mesh, G } from '../engine/materials.js';
 import { LINE_BY_ID, BRACHA, SHEMA } from '../data/lines.js';
 import { SHEMA_QUIET, SHEMA_REST } from '../data/shema.js';
+import { TEFILLIN_ICON } from '../ui/icons.js';
 import { createShelYad, createShelRosh, Wrap, createHeadStraps, createTarget, strapMesh } from '../world/tefillin.js';
 
 // הדרכה: מניחים תפילין לאדם אחד, צעד אחר צעד – בלי שעון ובלי לחץ.
@@ -183,9 +184,9 @@ export class Training {
     this.audio.sfx('buzz');
     this.ui.popupCenter(text, 'bad');
   }
-  good(text) {
+  good(text, opts) {
     this.audio.sfx('ding');
-    this.ui.popupCenter(text, 'good');
+    this.ui.popupCenter(text, 'good', opts);
   }
 
   // בחירה בין כמה נקודות על הדמות – הלחיצה הקרובה ביותר על המסך
@@ -404,7 +405,7 @@ export class Training {
       V(0, -0.33, 0.075),
     ]);
     shoulder.add(this.yadStrap);
-    this.good('מושלם! 📿');
+    this.good(`מושלם! ${TEFILLIN_ICON}`, { html: true });
   }
 
   // מילה אחרי מילה: כל הקשה נכונה משמיעה את המילה בקול של מנדי
@@ -632,7 +633,7 @@ export class Training {
     g.leave(c); // הולך לדרכו, ונעלם בקצה הרחוב
     await wait(0.6);
     const text = [
-      'עזרת ליהודי להניח תפילין – מצווה גדולה! 📿',
+      `עזרת ליהודי להניח תפילין – מצווה גדולה! ${TEFILLIN_ICON}`,
       this.mistakes ? `טעויות בדרך: ${this.mistakes} – בפעם הבאה זה יהיה עוד יותר קל` : 'בלי אף טעות – איזה שליח! 🌟',
     ].join('<br/>');
     return { stars, text };

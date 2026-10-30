@@ -128,10 +128,12 @@ export class UI {
   hideBanner() { $('banner').classList.add('hidden'); }
 
   // ---- הודעות קופצות ----
-  popup(text, x, y, cls = 'good') {
+  // html: לטקסט קבוע של המשחק שיש בו סמל (למשל התפילין). טקסט אחר נכנס כטקסט רגיל
+  popup(text, x, y, cls = 'good', { html = false } = {}) {
     const el = document.createElement('div');
     el.className = `popup ${cls}`;
-    el.textContent = text;
+    if (html) el.innerHTML = text;
+    else el.textContent = text;
     el.style.left = `${x}px`;
     el.style.top = `${y}px`;
     $('popups').appendChild(el);
@@ -141,9 +143,9 @@ export class UI {
     const p = this.project(world);
     this.popup(text, p.x, p.y, cls);
   }
-  popupCenter(text, cls = 'good big') {
+  popupCenter(text, cls = 'good big', opts) {
     const r = this.canvas.getBoundingClientRect();
-    this.popup(text, r.width / 2, r.height * 0.42, cls);
+    this.popup(text, r.width / 2, r.height * 0.42, cls, opts);
   }
 
   // ---- כלים להדרכה ----
