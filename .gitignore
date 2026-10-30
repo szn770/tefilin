@@ -5,3 +5,5 @@ dist
 .setup/
 # the Supabase CLI cache
 supabase/.temp/
+# הקלטות שהמשפחה מכינה ב-ElevenLabs, עד שבודקים אותן ומעבירים ל-public/audio
+הקלטות להחלפה/

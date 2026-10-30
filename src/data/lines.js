@@ -23,20 +23,27 @@ export const LINES = [
   { id: 'm_repeat', voices: ['mendy'], text: 'תגיד אחריי את הברכה', say: 'תַּגִּיד אַחֲרַי אֶת הַבְּרָכָה' },
   { id: 'm_wrap', voices: ['mendy'], text: 'עכשיו שבע כריכות!', say: 'עַכְשָׁו שֶׁבַע כְּרִיכוֹת!' },
   { id: 'm_rosh', voices: ['mendy'], text: 'עכשיו של ראש – מעל השיער', say: 'עַכְשָׁו שֶׁל רֹאשׁ, מֵעַל הַשֵּׂעָר' },
-  { id: 'm_finger', voices: ['mendy'], text: 'שלוש כריכות על האצבע', say: 'שָׁלוֹשׁ כְּרִיכוֹת עַל הָאֶצְבַּע' },
+  { id: 'm_palm', voices: ['mendy'], text: 'עכשיו על כף היד: חצי כריכה, וכריכה שלמה', say: 'עַכְשָׁו עַל כַּף הַיָּד: חֲצִי כְּרִיכָה, וּכְרִיכָה שְׁלֵמָה' },
+  { id: 'm_finger', voices: ['mendy'], text: 'שלוש כריכות על האצבע האמצעית: למטה, באמצע, ושוב למטה', say: 'שָׁלוֹשׁ כְּרִיכוֹת עַל הָאֶצְבַּע הָאֶמְצָעִית: לְמַטָּה, בָּאֶמְצַע, וְשׁוּב לְמַטָּה' },
   { id: 'm_shema', voices: ['mendy'], text: 'יד על העיניים, ונגיד שמע ישראל', say: 'יָד עַל הָעֵינַיִם, וְנַגִּיד שְׁמַע יִשְׂרָאֵל' },
   { id: 'm_remove', voices: ['mendy'], text: 'חולצים בסדר הפוך!', say: 'חוֹלְצִים בְּסֵדֶר הָפוּךְ!' },
   { id: 'm_lechaim', voices: ['mendy'], text: 'לחיים! מה תרצה?', say: 'לְחַיִּים! מָה תִּרְצֶה?' },
-  {
-    id: 'm_bracha', voices: ['mendy'],
-    text: 'ברוך אתה ה׳ אלוקינו מלך העולם אשר קדשנו במצוותיו וציוונו להניח תפילין',
-    say: 'בָּרוּךְ אַתָּה אֲדוֹשֵׁם אֱלוֹקֵינוּ מֶלֶךְ הָעוֹלָם, אֲשֶׁר קִדְּשָׁנוּ בְּמִצְוֹתָיו, וְצִוָּנוּ לְהָנִיחַ תְּפִלִּין',
-  },
-  {
-    id: 'm_shema_text', voices: ['mendy'],
-    text: 'שמע ישראל ה׳ אלוקינו ה׳ אחד',
-    say: 'שְׁמַע יִשְׂרָאֵל, אֲדוֹשֵׁם אֱלוֹקֵינוּ, אֲדוֹשֵׁם אֶחָד',
-  },
+  // הברכה ושמע ישראל מילה במילה (BRACHA, SHEMA למטה). כל מילה נשמעת רק כשהילד מקיש עליה
+  { id: 'w_baruch', voices: ['mendy'], text: 'ברוך', say: 'בָּרוּךְ' },
+  { id: 'w_ata', voices: ['mendy'], text: 'אתה', say: 'אַתָּה' },
+  { id: 'w_hashem', voices: ['mendy'], text: 'ה׳', say: 'אֲדוֹשֵׁם' },
+  { id: 'w_elokeinu', voices: ['mendy'], text: 'אלוקינו', say: 'אֱלוֹקֵינוּ' },
+  { id: 'w_melech', voices: ['mendy'], text: 'מלך', say: 'מֶלֶךְ' },
+  { id: 'w_haolam', voices: ['mendy'], text: 'העולם', say: 'הָעוֹלָם' },
+  { id: 'w_asher', voices: ['mendy'], text: 'אשר', say: 'אֲשֶׁר' },
+  { id: 'w_kidshanu', voices: ['mendy'], text: 'קדשנו', say: 'קִדְּשָׁנוּ' },
+  { id: 'w_bemitzvotav', voices: ['mendy'], text: 'במצוותיו', say: 'בְּמִצְוֹתָיו' },
+  { id: 'w_vetzivanu', voices: ['mendy'], text: 'וציוונו', say: 'וְצִוָּנוּ' },
+  { id: 'w_lehaniach', voices: ['mendy'], text: 'להניח', say: 'לְהָנִיחַ' },
+  { id: 'w_tefillin', voices: ['mendy'], text: 'תפילין', say: 'תְּפִלִּין' },
+  { id: 'w_shema', voices: ['mendy'], text: 'שמע', say: 'שְׁמַע' },
+  { id: 'w_yisrael', voices: ['mendy'], text: 'ישראל', say: 'יִשְׂרָאֵל' },
+  { id: 'w_echad', voices: ['mendy'], text: 'אחד', say: 'אֶחָד' },
 
   // ---- עוברים ושבים ----
   { id: 'c_ok', voices: MEN, text: 'יאללה, בסדר!', say: 'יַאללָה, בְּסֵדֶר!' },
@@ -60,8 +67,15 @@ export const LINES = [
 
 export const LINE_BY_ID = Object.fromEntries(LINES.map((l) => [l.id, l]));
 
-// מה שנשמע בהדרכה. npm run voices:training מקליט רק את אלה
+// המילים של הברכה ושל שמע ישראל, לפי הסדר (ה׳ ואלוקינו חוזרות על אותן הקלטות)
+export const BRACHA = [
+  'w_baruch', 'w_ata', 'w_hashem', 'w_elokeinu', 'w_melech', 'w_haolam',
+  'w_asher', 'w_kidshanu', 'w_bemitzvotav', 'w_vetzivanu', 'w_lehaniach', 'w_tefillin',
+];
+export const SHEMA = ['w_shema', 'w_yisrael', 'w_hashem', 'w_elokeinu', 'w_hashem', 'w_echad'];
+
+// מה שנשמע בהדרכה, לפי הסדר. npm run voices:training מקליט רק את אלה
 export const TRAINING_LINE_IDS = [
-  'm_learn', 'm_repeat', 'm_bracha', 'm_wrap', 'm_rosh', 'm_finger', 'm_shema', 'm_shema_text',
-  'm_remove', 'm_lechaim', 'm_mazal', 'c_lefty', 'c_righty', 'c_thanks',
+  'm_learn', 'c_righty', 'c_lefty', 'm_repeat', ...new Set([...BRACHA, ...SHEMA]),
+  'm_wrap', 'm_palm', 'm_rosh', 'm_finger', 'm_shema', 'm_remove', 'm_lechaim', 'c_thanks', 'm_mazal',
 ];

@@ -1,0 +1,114 @@
+<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>כל ההקלטות – מבצע תפילין</title>
+<style>
+body{font-family:Arial,sans-serif;margin:0;background:#f4f7fb;color:#1f2d55}
+header{position:sticky;top:0;z-index:2;background:#1f2d55;color:#fff;padding:12px 20px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+header h1{margin:0 0 0 auto;font-size:22px}
+header button{font:inherit;font-size:16px;padding:8px 16px;border:0;border-radius:999px;background:#fff;color:#1f2d55;cursor:pointer}
+header .count{font-weight:700}
+.help{margin:16px 20px;line-height:1.7;max-width:950px}
+.help code{background:#fff;padding:1px 6px;border-radius:6px}
+table{border-collapse:collapse;width:calc(100% - 40px);margin:0 20px 40px;background:#fff}
+td,th{padding:8px 10px;border-bottom:1px solid #dde4ef;text-align:right;vertical-align:middle}
+tr.g th{background:#dcefff;font-size:18px;padding:10px}
+td.n{color:#5f6d96;width:2.5em}
+td.t{font-size:24px;font-weight:700}
+td.say{font-size:22px;cursor:copy}
+td.who small{display:block;color:#5f6d96}
+.mark{width:22px;height:22px;accent-color:#d94a6f}
+tr.marked{background:#fde5ec}
+tr.on{background:#fff3c4}
+button.name{font-family:monospace;font-size:14px;padding:6px 10px;border:1px solid #c6d3ea;border-radius:8px;background:#f7faff;cursor:copy}
+.copied{outline:3px solid #1d9a5c}
+</style></head>
+<body>
+<header><h1>כל ההקלטות במשחק</h1>
+  <button id="all">▶ הכול ברצף</button><button id="onlyMarked">▶ רק המסומנים</button><button id="stop">⏹ עצירה</button>
+  <button id="copyList">העתקת רשימת המסומנים</button><span class="count" id="count"></span></header>
+<div class="help">
+  <p><b>מה עושים:</b> מאזינים ומסמנים ✓ ליד כל הקלטה שנשמעת מוזרה. הסימונים נשמרים בדפדפן הזה. "העתקת רשימת המסומנים" מעתיקה את כולם, ואפשר להדביק אותם לי.</p>
+  <p><b>כדי להקליט בעצמכם ב-ElevenLabs:</b> לוחצים על הטקסט המנוקד (עמודת "מה מדביקים ב-ElevenLabs") והוא מועתק. מדביקים אותו ב-ElevenLabs ובוחרים את אותו קול שמדבר בשורה, כדי שכל דמות תישמע אותו דבר לאורך ההדרכה. שומרים את הקובץ בשם שבעמודה האחרונה (לחיצה מעתיקה, למשל <code>w_baruch.mp3</code>), בתיקייה <code>הקלטות להחלפה</code> שבתיקיית המשחק. כשתסיימו, תגידו לי: אשווה את העוצמה לשאר ההקלטות ואכניס אותן למשחק.</p>
+  <p><b>הקולות בהדרכה</b> (מודל Eleven v3, שפה: עברית):</p>
+  <ul><li><b>מנדי</b>: הקול <b>Liam</b> <button class="name" title="העתקת המזהה">TX3LPaxmHKxFdv7VOQHJ</button></li><li><b>המתלמד</b>: הקול <b>Chris</b> <button class="name" title="העתקת המזהה">iP95p4xoKVk53GoZ742B</button></li></ul>
+  <p>במקום ה׳ שולחים לקול "אֲדוֹשֵׁם".</p>
+</div>
+<table><tr><th>#</th><th>מוזר?</th><th>מה כתוב במשחק</th><th>מה מדביקים ב-ElevenLabs</th><th>מי מדבר</th><th>הקלטה</th><th>שם קובץ להחלפה</th></tr>
+<tr class="g"><th colspan="7">ההדרכה, לפי הסדר</th></tr>
+<tr data-name="m_learn.mp3"><td class="n">1</td><td><input type="checkbox" class="mark" aria-label="נשמע מוזר"></td><td class="t">בוא, נלמד ביחד להניח תפילין!</td><td class="say copy" title="לחיצה מעתיקה">בּוֹא, נִלְמַד בְּיַחַד לְהָנִיחַ תְּפִלִּין!</td><td class="who">מנדי<small>Liam</small></td><td><audio controls preload="none" src="../public/audio/voice/m_learn.mp3"></audio></td><td><button class="name" title="העתקת שם הקובץ">m_learn.mp3</button></td></tr>
+<tr data-name="c_righty.mp3"><td class="n">2</td><td><input type="checkbox" class="mark" aria-label="נשמע מוזר"></td><td class="t">אני כותב ביד ימין</td><td class="say copy" title="לחיצה מעתיקה">אֲנִי כּוֹתֵב בַּיָּד יָמִין</td><td class="who">המתלמד<small>Chris</small></td><td><audio controls preload="none" src="../public/audio/voice/c_righty.mp3"></audio></td><td><button class="name" title="העתקת שם הקובץ">c_righty.mp3</button></td></tr>
+<tr data-name="c_lefty.mp3"><td class="n">3</td><td><input type="checkbox" class="mark" aria-label="נשמע מוזר"></td><td class="t">אני שמאלי!</td><td class="say copy" title="לחיצה מעתיקה">אֲנִי שְׂמָאלִי!</td><td class="who">המתלמד<small>Chris</small></td><td><audio controls preload="none" src="../public/audio/voice/c_lefty.mp3"></audio></td><td><button class="name" title="העתקת שם הקובץ">c_lefty.mp3</button></td></tr>
+<tr data-name="m_repeat.mp3"><td class="n">4</td><td><input type="checkbox" class="mark" aria-label="נשמע מוזר"></td><td class="t">תגיד אחריי את הברכה</td><td class="say copy" title="לחיצה מעתיקה">תַּגִּיד אַחֲרַי אֶת הַבְּרָכָה</td><td class="who">מנדי<small>Liam</small></td><td><audio controls preload="none" src="../public/audio/voice/m_repeat.mp3"></audio></td><td><button class="name" title="העתקת שם הקובץ">m_repeat.mp3</button></td></tr>
+<tr data-name="m_wrap.mp3"><td class="n">5</td><td><input type="checkbox" class="mark" aria-label="נשמע מוזר"></td><td class="t">עכשיו שבע כריכות!</td><td class="say copy" title="לחיצה מעתיקה">עַכְשָׁו שֶׁבַע כְּרִיכוֹת!</td><td class="who">מנדי<small>Liam</small></td><td><audio controls preload="none" src="../public/audio/voice/m_wrap.mp3"></audio></td><td><button class="name" title="העתקת שם הקובץ">m_wrap.mp3</button></td></tr>
+<tr data-name="m_palm.mp3"><td class="n">6</td><td><input type="checkbox" class="mark" aria-label="נשמע מוזר"></td><td class="t">עכשיו על כף היד: חצי כריכה, וכריכה שלמה</td><td class="say copy" title="לחיצה מעתיקה">עַכְשָׁו עַל כַּף הַיָּד: חֲצִי כְּרִיכָה, וּכְרִיכָה שְׁלֵמָה</td><td class="who">מנדי<small>Liam</small></td><td><audio controls preload="none" src="../public/audio/voice/m_palm.mp3"></audio></td><td><button class="name" title="העתקת שם הקובץ">m_palm.mp3</button></td></tr>
+<tr data-name="m_rosh.mp3"><td class="n">7</td><td><input type="checkbox" class="mark" aria-label="נשמע מוזר"></td><td class="t">עכשיו של ראש – מעל השיער</td><td class="say copy" title="לחיצה מעתיקה">עַכְשָׁו שֶׁל רֹאשׁ, מֵעַל הַשֵּׂעָר</td><td class="who">מנדי<small>Liam</small></td><td><audio controls preload="none" src="../public/audio/voice/m_rosh.mp3"></audio></td><td><button class="name" title="העתקת שם הקובץ">m_rosh.mp3</button></td></tr>
+<tr data-name="m_finger.mp3"><td class="n">8</td><td><input type="checkbox" class="mark" aria-label="נשמע מוזר"></td><td class="t">שלוש כריכות על האצבע האמצעית: למטה, באמצע, ושוב למטה</td><td class="say copy" title="לחיצה מעתיקה">שָׁלוֹשׁ כְּרִיכוֹת עַל הָאֶצְבַּע הָאֶמְצָעִית: לְמַטָּה, בָּאֶמְצַע, וְשׁוּב לְמַטָּה</td><td class="who">מנדי<small>Liam</small></td><td><audio controls preload="none" src="../public/audio/voice/m_finger.mp3"></audio></td><td><button class="name" title="העתקת שם הקובץ">m_finger.mp3</button></td></tr>
+<tr data-name="m_shema.mp3"><td class="n">9</td><td><input type="checkbox" class="mark" aria-label="נשמע מוזר"></td><td class="t">יד על העיניים, ונגיד שמע ישראל</td><td class="say copy" title="לחיצה מעתיקה">יָד עַל הָעֵינַיִם, וְנַגִּיד שְׁמַע יִשְׂרָאֵל</td><td class="who">מנדי<small>Liam</small></td><td><audio controls preload="none" src="../public/audio/voice/m_shema.mp3"></audio></td><td><button class="name" title="העתקת שם הקובץ">m_shema.mp3</button></td></tr>
+<tr data-name="m_remove.mp3"><td class="n">10</td><td><input type="checkbox" class="mark" aria-label="נשמע מוזר"></td><td class="t">חולצים בסדר הפוך!</td><td class="say copy" title="לחיצה מעתיקה">חוֹלְצִים בְּסֵדֶר הָפוּךְ!</td><td class="who">מנדי<small>Liam</small></td><td><audio controls preload="none" src="../public/audio/voice/m_remove.mp3"></audio></td><td><button class="name" title="העתקת שם הקובץ">m_remove.mp3</button></td></tr>
+<tr data-name="m_lechaim.mp3"><td class="n">11</td><td><input type="checkbox" class="mark" aria-label="נשמע מוזר"></td><td class="t">לחיים! מה תרצה?</td><td class="say copy" title="לחיצה מעתיקה">לְחַיִּים! מָה תִּרְצֶה?</td><td class="who">מנדי<small>Liam</small></td><td><audio controls preload="none" src="../public/audio/voice/m_lechaim.mp3"></audio></td><td><button class="name" title="העתקת שם הקובץ">m_lechaim.mp3</button></td></tr>
+<tr data-name="c_thanks__man.mp3"><td class="n">12</td><td><input type="checkbox" class="mark" aria-label="נשמע מוזר"></td><td class="t">תודה רבה!</td><td class="say copy" title="לחיצה מעתיקה">תּוֹדָה רַבָּה!</td><td class="who">המתלמד<small>Chris</small></td><td><audio controls preload="none" src="../public/audio/voice/c_thanks__man.mp3"></audio></td><td><button class="name" title="העתקת שם הקובץ">c_thanks__man.mp3</button></td></tr>
+<tr data-name="m_mazal.mp3"><td class="n">13</td><td><input type="checkbox" class="mark" aria-label="נשמע מוזר"></td><td class="t">מזל טוב! יישר כח!</td><td class="say copy" title="לחיצה מעתיקה">מַזָּל טוֹב! יִישַׁר כֹּחַ!</td><td class="who">מנדי<small>Liam</small></td><td><audio controls preload="none" src="../public/audio/voice/m_mazal.mp3"></audio></td><td><button class="name" title="העתקת שם הקובץ">m_mazal.mp3</button></td></tr>
+<tr class="g"><th colspan="7">הברכה, מילה במילה</th></tr>
+<tr data-name="w_baruch.mp3"><td class="n">14</td><td><input type="checkbox" class="mark" aria-label="נשמע מוזר"></td><td class="t">ברוך</td><td class="say copy" title="לחיצה מעתיקה">בָּרוּךְ</td><td class="who">מנדי<small>Liam</small></td><td><audio controls preload="none" src="../public/audio/voice/w_baruch.mp3"></audio></td><td><button class="name" title="העתקת שם הקובץ">w_baruch.mp3</button></td></tr>
+<tr data-name="w_ata.mp3"><td class="n">15</td><td><input type="checkbox" class="mark" aria-label="נשמע מוזר"></td><td class="t">אתה</td><td class="say copy" title="לחיצה מעתיקה">אַתָּה</td><td class="who">מנדי<small>Liam</small></td><td><audio controls preload="none" src="../public/audio/voice/w_ata.mp3"></audio></td><td><button class="name" title="העתקת שם הקובץ">w_ata.mp3</button></td></tr>
+<tr data-name="w_hashem.mp3"><td class="n">16</td><td><input type="checkbox" class="mark" aria-label="נשמע מוזר"></td><td class="t">ה׳</td><td class="say copy" title="לחיצה מעתיקה">אֲדוֹשֵׁם</td><td class="who">מנדי<small>Liam</small></td><td><audio controls preload="none" src="../public/audio/voice/w_hashem.mp3"></audio></td><td><button class="name" title="העתקת שם הקובץ">w_hashem.mp3</button></td></tr>
+<tr data-name="w_elokeinu.mp3"><td class="n">17</td><td><input type="checkbox" class="mark" aria-label="נשמע מוזר"></td><td class="t">אלוקינו</td><td class="say copy" title="לחיצה מעתיקה">אֱלוֹקֵינוּ</td><td class="who">מנדי<small>Liam</small></td><td><audio controls preload="none" src="../public/audio/voice/w_elokeinu.mp3"></audio></td><td><button class="name" title="העתקת שם הקובץ">w_elokeinu.mp3</button></td></tr>
+<tr data-name="w_melech.mp3"><td class="n">18</td><td><input type="checkbox" class="mark" aria-label="נשמע מוזר"></td><td class="t">מלך</td><td class="say copy" title="לחיצה מעתיקה">מֶלֶךְ</td><td class="who">מנדי<small>Liam</small></td><td><audio controls preload="none" src="../public/audio/voice/w_melech.mp3"></audio></td><td><button class="name" title="העתקת שם הקובץ">w_melech.mp3</button></td></tr>
+<tr data-name="w_haolam.mp3"><td class="n">19</td><td><input type="checkbox" class="mark" aria-label="נשמע מוזר"></td><td class="t">העולם</td><td class="say copy" title="לחיצה מעתיקה">הָעוֹלָם</td><td class="who">מנדי<small>Liam</small></td><td><audio controls preload="none" src="../public/audio/voice/w_haolam.mp3"></audio></td><td><button class="name" title="העתקת שם הקובץ">w_haolam.mp3</button></td></tr>
+<tr data-name="w_asher.mp3"><td class="n">20</td><td><input type="checkbox" class="mark" aria-label="נשמע מוזר"></td><td class="t">אשר</td><td class="say copy" title="לחיצה מעתיקה">אֲשֶׁר</td><td class="who">מנדי<small>Liam</small></td><td><audio controls preload="none" src="../public/audio/voice/w_asher.mp3"></audio></td><td><button class="name" title="העתקת שם הקובץ">w_asher.mp3</button></td></tr>
+<tr data-name="w_kidshanu.mp3"><td class="n">21</td><td><input type="checkbox" class="mark" aria-label="נשמע מוזר"></td><td class="t">קדשנו</td><td class="say copy" title="לחיצה מעתיקה">קִדְּשָׁנוּ</td><td class="who">מנדי<small>Liam</small></td><td><audio controls preload="none" src="../public/audio/voice/w_kidshanu.mp3"></audio></td><td><button class="name" title="העתקת שם הקובץ">w_kidshanu.mp3</button></td></tr>
+<tr data-name="w_bemitzvotav.mp3"><td class="n">22</td><td><input type="checkbox" class="mark" aria-label="נשמע מוזר"></td><td class="t">במצוותיו</td><td class="say copy" title="לחיצה מעתיקה">בְּמִצְוֹתָיו</td><td class="who">מנדי<small>Liam</small></td><td><audio controls preload="none" src="../public/audio/voice/w_bemitzvotav.mp3"></audio></td><td><button class="name" title="העתקת שם הקובץ">w_bemitzvotav.mp3</button></td></tr>
+<tr data-name="w_vetzivanu.mp3"><td class="n">23</td><td><input type="checkbox" class="mark" aria-label="נשמע מוזר"></td><td class="t">וציוונו</td><td class="say copy" title="לחיצה מעתיקה">וְצִוָּנוּ</td><td class="who">מנדי<small>Liam</small></td><td><audio controls preload="none" src="../public/audio/voice/w_vetzivanu.mp3"></audio></td><td><button class="name" title="העתקת שם הקובץ">w_vetzivanu.mp3</button></td></tr>
+<tr data-name="w_lehaniach.mp3"><td class="n">24</td><td><input type="checkbox" class="mark" aria-label="נשמע מוזר"></td><td class="t">להניח</td><td class="say copy" title="לחיצה מעתיקה">לְהָנִיחַ</td><td class="who">מנדי<small>Liam</small></td><td><audio controls preload="none" src="../public/audio/voice/w_lehaniach.mp3"></audio></td><td><button class="name" title="העתקת שם הקובץ">w_lehaniach.mp3</button></td></tr>
+<tr data-name="w_tefillin.mp3"><td class="n">25</td><td><input type="checkbox" class="mark" aria-label="נשמע מוזר"></td><td class="t">תפילין</td><td class="say copy" title="לחיצה מעתיקה">תְּפִלִּין</td><td class="who">מנדי<small>Liam</small></td><td><audio controls preload="none" src="../public/audio/voice/w_tefillin.mp3"></audio></td><td><button class="name" title="העתקת שם הקובץ">w_tefillin.mp3</button></td></tr>
+<tr class="g"><th colspan="7">שמע ישראל, מילה במילה (ה׳ ואלוקינו נשמעות מההקלטות של הברכה)</th></tr>
+<tr data-name="w_shema.mp3"><td class="n">26</td><td><input type="checkbox" class="mark" aria-label="נשמע מוזר"></td><td class="t">שמע</td><td class="say copy" title="לחיצה מעתיקה">שְׁמַע</td><td class="who">מנדי<small>Liam</small></td><td><audio controls preload="none" src="../public/audio/voice/w_shema.mp3"></audio></td><td><button class="name" title="העתקת שם הקובץ">w_shema.mp3</button></td></tr>
+<tr data-name="w_yisrael.mp3"><td class="n">27</td><td><input type="checkbox" class="mark" aria-label="נשמע מוזר"></td><td class="t">ישראל</td><td class="say copy" title="לחיצה מעתיקה">יִשְׂרָאֵל</td><td class="who">מנדי<small>Liam</small></td><td><audio controls preload="none" src="../public/audio/voice/w_yisrael.mp3"></audio></td><td><button class="name" title="העתקת שם הקובץ">w_yisrael.mp3</button></td></tr>
+<tr data-name="w_echad.mp3"><td class="n">28</td><td><input type="checkbox" class="mark" aria-label="נשמע מוזר"></td><td class="t">אחד</td><td class="say copy" title="לחיצה מעתיקה">אֶחָד</td><td class="who">מנדי<small>Liam</small></td><td><audio controls preload="none" src="../public/audio/voice/w_echad.mp3"></audio></td><td><button class="name" title="העתקת שם הקובץ">w_echad.mp3</button></td></tr>
+<tr class="g"><th colspan="7">מוקלטים, אבל לא נשמעים כרגע (במשחק הרגיל אין קולות)</th></tr>
+<tr data-name="c_thanks__man2.mp3"><td class="n">29</td><td><input type="checkbox" class="mark" aria-label="נשמע מוזר"></td><td class="t">תודה רבה!</td><td class="say copy" title="לחיצה מעתיקה">תּוֹדָה רַבָּה!</td><td class="who">עובר אורח<small>Eric</small></td><td><audio controls preload="none" src="../public/audio/voice/c_thanks__man2.mp3"></audio></td><td><button class="name" title="העתקת שם הקובץ">c_thanks__man2.mp3</button></td></tr>
+<tr data-name="c_thanks__oldman.mp3"><td class="n">30</td><td><input type="checkbox" class="mark" aria-label="נשמע מוזר"></td><td class="t">תודה רבה!</td><td class="say copy" title="לחיצה מעתיקה">תּוֹדָה רַבָּה!</td><td class="who">סבא<small>Bill</small></td><td><audio controls preload="none" src="../public/audio/voice/c_thanks__oldman.mp3"></audio></td><td><button class="name" title="העתקת שם הקובץ">c_thanks__oldman.mp3</button></td></tr>
+<tr class="g"><th colspan="7">מוזיקה</th></tr>
+<tr data-name="nigun.mp3"><td class="n">31</td><td><input type="checkbox" class="mark" aria-label="נשמע מוזר"></td><td class="t">הניגון של כפתור הרמקול</td><td class="say copy" title="לחיצה מעתיקה"></td><td class="who"></td><td><audio controls preload="none" src="../public/audio/sfx/nigun.mp3"></audio></td><td><button class="name" title="העתקת שם הקובץ">nigun.mp3</button></td></tr>
+</table>
+<script>
+const KEY = "tefillin-review-marks";
+let marks = {}; try{ marks = JSON.parse(localStorage.getItem(KEY)) || {}; }catch(e){}
+const rows = [...document.querySelectorAll("tr[data-name]")];
+function paint(){
+  rows.forEach(r => { const on = !!marks[r.dataset.name]; r.classList.toggle("marked", on); r.querySelector(".mark").checked = on; });
+  document.getElementById("count").textContent = "מסומנים: " + rows.filter(r => marks[r.dataset.name]).length;
+}
+document.addEventListener("change", e => {
+  if(!e.target.classList.contains("mark")) return;
+  const name = e.target.closest("tr").dataset.name;
+  if(e.target.checked) marks[name] = 1; else delete marks[name];
+  try{ localStorage.setItem(KEY, JSON.stringify(marks)); }catch(err){}
+  paint();
+});
+async function copy(text, el){
+  try{ await navigator.clipboard.writeText(text); }
+  catch(e){ const t = document.createElement("textarea"); t.value = text; document.body.append(t); t.select(); document.execCommand("copy"); t.remove(); }
+  el.classList.add("copied"); setTimeout(() => el.classList.remove("copied"), 700);
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("button.name, td.copy");
+  if(b && b.textContent.trim()) copy(b.textContent.trim(), b);
+});
+let playing = 0;
+async function playRows(list){
+  const run = ++playing;
+  for(const r of list){
+    if(run !== playing) return;
+    const a = r.querySelector("audio");
+    r.classList.add("on"); r.scrollIntoView({block:"center"});
+    await new Promise(res => { a.onended = res; a.onerror = res; a.play().catch(res); });
+    r.classList.remove("on"); await new Promise(res => setTimeout(res, 350));
+  }
+}
+document.getElementById("all").onclick = () => playRows(rows);
+document.getElementById("onlyMarked").onclick = () => playRows(rows.filter(r => marks[r.dataset.name]));
+document.getElementById("stop").onclick = () => { playing++; document.querySelectorAll("audio").forEach(a => a.pause()); rows.forEach(r => r.classList.remove("on")); };
+document.getElementById("copyList").onclick = e => copy(rows.filter(r => marks[r.dataset.name])
+  .map(r => r.querySelector(".n").textContent + ". " + r.querySelector(".t").textContent + " = " + r.dataset.name).join("\n") || "(אין מסומנים)", e.target);
+paint();
+</script></body></html>

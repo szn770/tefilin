@@ -57,9 +57,9 @@ function addShine(bayit, size) {
 // ---- רצועות ----
 const strapMat = toon(0x121216, { unique: true });
 
-export function strapMesh(points, closed = false, segs = null) {
+export function strapMesh(points, closed = false, segs = null, thick = STRAP_R) {
   const curve = new THREE.CatmullRomCurve3(points, closed, 'centripetal');
-  const geo = new THREE.TubeGeometry(curve, segs ?? Math.max(8, points.length * 6), STRAP_R, 5, closed);
+  const geo = new THREE.TubeGeometry(curve, segs ?? Math.max(8, points.length * 6), thick, 5, closed);
   const m = new THREE.Mesh(geo, strapMat);
   m.castShadow = true;
   addOutline(m);
@@ -67,10 +67,12 @@ export function strapMesh(points, closed = false, segs = null) {
 }
 
 // כריכות דינמיות: סליל סביב איבר. המיקומים במרחב המקומי של ההורה (מפרק המרפק).
+// squash מצמצם את הסליל בעומק (כף יד שטוחה). yAt(u) קובע את הגובה לפי מספר הסיבובים u,
+// במקום ירידה אחידה מ-yStart ל-yEnd (למשל באצבע: למטה, באמצע ושוב למטה). thick = עובי הרצועה
 export class Wrap {
-  constructor(parent, { yStart, yEnd, radius, turns, lead = null }) {
+  constructor(parent, { yStart, yEnd, radius, turns, lead = null, squash = 1, yAt = null, thick = STRAP_R }) {
     this.parent = parent;
-    this.opts = { yStart, yEnd, radius, turns };
+    this.opts = { yStart, yEnd, radius, turns, squash, yAt, thick };
     this.lead = lead; // נקודות לפני הסליל (למשל מהמרפק)
     this.mesh = null;
     this.progress = 0;
@@ -87,7 +89,7 @@ export class Wrap {
       this.mesh.geometry.dispose();
       this.mesh = null;
     }
-    const { yStart, yEnd, radius, turns } = this.opts;
+    const { yStart, yEnd, radius, turns, squash, yAt, thick } = this.opts;
     const total = turns * Math.PI * 2;
     const tMax = total * this.progress;
     if (tMax < 0.05) return;
@@ -95,11 +97,11 @@ export class Wrap {
     const steps = Math.max(2, Math.ceil(tMax / 0.35));
     for (let i = 0; i <= steps; i++) {
       const t = (tMax * i) / steps;
-      const y = yStart + (yEnd - yStart) * (t / total);
-      pts.push(new THREE.Vector3(Math.cos(t) * radius, y, Math.sin(t) * radius));
+      const y = yAt ? yAt(t / (Math.PI * 2)) : yStart + (yEnd - yStart) * (t / total);
+      pts.push(new THREE.Vector3(Math.cos(t) * radius, y, Math.sin(t) * radius * squash));
     }
     if (pts.length < 2) return;
-    this.mesh = strapMesh(pts, false, pts.length * 4);
+    this.mesh = strapMesh(pts, false, pts.length * 4, thick);
     this.parent.add(this.mesh);
   }
   dispose() {

@@ -194,19 +194,19 @@ export class UI {
   }
 
   // טבעת שמראה כמה סיבובים כבר עשו (כריכות)
-  showRing(x, y, count, total) {
+  showRing(x, y, text) {
     const el = $('ring-guide');
     el.classList.remove('hidden');
     this.moveRing(x, y);
-    this.setRing(0, count, total);
+    this.setRing(0, text);
   }
   moveRing(x, y) {
     $('ring-guide').style.left = `${x}px`;
     $('ring-guide').style.top = `${y}px`;
   }
-  setRing(frac, count, total) {
+  setRing(frac, text) {
     $('ring-progress').style.strokeDashoffset = `${503 * (1 - frac)}`;
-    $('ring-count').textContent = `${count}/${total}`;
+    $('ring-count').textContent = text;
   }
   hideRing() { $('ring-guide').classList.add('hidden'); }
 

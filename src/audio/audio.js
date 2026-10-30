@@ -59,7 +59,8 @@ export class GameAudio {
   }
 
   // מנגן משפט. מחזיר את משך המשפט בשניות (או הערכה לפי אורך הטקסט כשאין הקלטה).
-  async voice(id, voiceKey) {
+  // cut: עוצר את מה שנוגן קודם עם cut (מילים בברכה, כשמקישים מהר)
+  async voice(id, voiceKey, { cut = false } = {}) {
     const line = LINE_BY_ID[id];
     const estimate = line ? Math.max(1.1, line.text.length * 0.07) : 1.2;
     if (!this.ctx || !this.voicesOn) return estimate;
@@ -71,6 +72,10 @@ export class GameAudio {
     const src = this.ctx.createBufferSource();
     src.buffer = buf;
     src.connect(this.voiceBus);
+    if (cut) {
+      try { this.cutSrc?.stop(); } catch { /* כבר נגמר */ }
+      this.cutSrc = src;
+    }
     src.start();
     return buf.duration;
   }

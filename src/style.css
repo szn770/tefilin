@@ -254,8 +254,9 @@ html, body {
 }
 .ring-arrow { fill: #fff; transform-origin: 100px 100px; animation: spin 1.6s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
+/* המספר מתחת לטבעת, כדי שלא יסתיר את המקום שכורכים עליו */
 .ring-count {
-  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  position: absolute; left: 50%; top: 100%; transform: translate(-50%, -4px);
   font-family: 'Secular One'; font-size: 38px; color: #fff;
   text-shadow: 0 3px 0 var(--navy), 0 0 8px rgba(0,0,0,.4);
 }

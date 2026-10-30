@@ -208,6 +208,14 @@ export class Person {
     mouth.rotation.x = -0.25;
     head.add(mouth);
     this.mouth = mouth;
+    // בזמן דיבור: פה קטן וכהה שנפתח מעט, במקום החיוך
+    const open = mesh(G.sphere(0.038, 14, 10), 0x4a2326, { outline: false, shadow: false });
+    open.position.set(0, -0.118, 0.236);
+    open.rotation.x = 0.45;
+    open.scale.set(1, 0.3, 0.45);
+    open.visible = false;
+    head.add(open);
+    this.mouthOpen = open;
 
     // שיער
     if (L.hat === 'tichel') {
@@ -242,6 +250,7 @@ export class Person {
       // הפה מעל הזקן
       this.mouth.position.z = 0.28;
       this.mouth.position.y = -0.08;
+      this.mouthOpen.position.set(0, -0.112, 0.268);
       const stache = mesh(G.capsule(0.03, 0.12, 4, 8), beardColor, { outline: false });
       stache.rotation.z = Math.PI / 2;
       stache.position.set(0, -0.06, 0.27);
@@ -485,10 +494,13 @@ export class Person {
     let headZ = Math.sin(this.time * 1.3) * 0.03;
     if (this.talkTimer > 0) {
       this.talkTimer -= dt;
-      headX += Math.sin(this.time * 14) * 0.04;
-      this.mouth.scale.y = 1 + Math.abs(Math.sin(this.time * 18)) * 1.6;
-    } else {
-      this.mouth.scale.y = lerp(this.mouth.scale.y, 1, k);
+      headX += Math.sin(this.time * 14) * 0.03;
+      this.mouth.visible = false;
+      this.mouthOpen.visible = true;
+      this.mouthOpen.scale.y = 0.22 + Math.abs(Math.sin(this.time * 11)) * 0.3;
+    } else if (this.mouthOpen.visible) {
+      this.mouthOpen.visible = false;
+      this.mouth.visible = true;
     }
     J.head.rotation.set(headX, this.current.head.y, headZ);
 
