@@ -202,9 +202,10 @@ export class Person {
     nose.position.set(0, -0.025, 0.27);
     head.add(nose);
 
-    const mouth = mesh(G.torus(0.065, 0.015, 8, 16, Math.PI), 0x6b2737, { outline: false, shadow: false });
+    // חיוך קטן ועדין (קשת דקה), ולא קשת אדומה גדולה
+    const mouth = mesh(G.torus(0.032, 0.008, 6, 14, Math.PI), 0x5c2b2e, { outline: false, shadow: false });
     mouth.rotation.z = Math.PI;
-    mouth.position.set(0, -0.085, 0.25);
+    mouth.position.set(0, -0.1, 0.246);
     mouth.rotation.x = -0.25;
     head.add(mouth);
     this.mouth = mouth;
@@ -248,9 +249,9 @@ export class Person {
       beard.scale.set(1.08, 0.85, 0.75);
       head.add(beard);
       // הפה מעל הזקן
-      this.mouth.position.z = 0.28;
-      this.mouth.position.y = -0.08;
-      this.mouthOpen.position.set(0, -0.112, 0.268);
+      this.mouth.position.z = 0.272;
+      this.mouth.position.y = -0.085;
+      this.mouthOpen.position.set(0, -0.105, 0.262);
       const stache = mesh(G.capsule(0.03, 0.12, 4, 8), beardColor, { outline: false });
       stache.rotation.z = Math.PI / 2;
       stache.position.set(0, -0.06, 0.27);

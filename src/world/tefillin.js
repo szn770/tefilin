@@ -68,11 +68,12 @@ export function strapMesh(points, closed = false, segs = null, thick = STRAP_R) 
 
 // כריכות דינמיות: סליל סביב איבר. המיקומים במרחב המקומי של ההורה (מפרק המרפק).
 // squash מצמצם את הסליל בעומק (כף יד שטוחה). yAt(u) קובע את הגובה לפי מספר הסיבובים u,
-// במקום ירידה אחידה מ-yStart ל-yEnd (למשל באצבע: למטה, באמצע ושוב למטה). thick = עובי הרצועה
+// במקום ירידה אחידה מ-yStart ל-yEnd (למשל באצבע: למטה, באמצע ושוב למטה). thick = עובי הרצועה.
+// flip הופך את כיוון הכריכה (תמונת ראי), כדי שביד שמאל וביד ימין היא תהיה כלפי חוץ
 export class Wrap {
-  constructor(parent, { yStart, yEnd, radius, turns, lead = null, squash = 1, yAt = null, thick = STRAP_R }) {
+  constructor(parent, { yStart, yEnd, radius, turns, lead = null, squash = 1, yAt = null, thick = STRAP_R, flip = false }) {
     this.parent = parent;
-    this.opts = { yStart, yEnd, radius, turns, squash, yAt, thick };
+    this.opts = { yStart, yEnd, radius, turns, squash, yAt, thick, flip };
     this.lead = lead; // נקודות לפני הסליל (למשל מהמרפק)
     this.mesh = null;
     this.progress = 0;
@@ -89,7 +90,7 @@ export class Wrap {
       this.mesh.geometry.dispose();
       this.mesh = null;
     }
-    const { yStart, yEnd, radius, turns, squash, yAt, thick } = this.opts;
+    const { yStart, yEnd, radius, turns, squash, yAt, thick, flip } = this.opts;
     const total = turns * Math.PI * 2;
     const tMax = total * this.progress;
     if (tMax < 0.05) return;
@@ -98,7 +99,7 @@ export class Wrap {
     for (let i = 0; i <= steps; i++) {
       const t = (tMax * i) / steps;
       const y = yAt ? yAt(t / (Math.PI * 2)) : yStart + (yEnd - yStart) * (t / total);
-      pts.push(new THREE.Vector3(Math.cos(t) * radius, y, Math.sin(t) * radius * squash));
+      pts.push(new THREE.Vector3(Math.cos(t) * radius * (flip ? -1 : 1), y, Math.sin(t) * radius * squash));
     }
     if (pts.length < 2) return;
     this.mesh = strapMesh(pts, false, pts.length * 4, thick);

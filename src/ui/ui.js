@@ -210,9 +210,28 @@ export class UI {
   }
   hideRing() { $('ring-guide').classList.add('hidden'); }
 
+  // קטע ארוך (המשך קריאת שמע): מקישים עליו פעם אחת ומסמנים שקראנו
+  readBlock(quiet, paragraphs) {
+    const box = $('reading');
+    box.innerHTML = `<div class="reading-text"><p class="quiet">${quiet}</p>${paragraphs.map((p) => `<p>${p}</p>`).join('')}</div>`
+      + '<div class="reading-mark">הקישו כדי לסמן שקראנו ✓</div>';
+    box.classList.remove('hidden', 'done');
+    box.querySelector('.reading-text').scrollTop = 0;
+    return new Promise((resolve) => {
+      // click ולא pointerdown, כדי שגלילה בטקסט לא תסמן אותו
+      box.onclick = () => {
+        box.onclick = null;
+        box.classList.add('done');
+        box.querySelector('.reading-mark').textContent = 'קראנו! ✓';
+        wait(0.7).then(() => { box.classList.add('hidden'); resolve(); });
+      };
+    });
+  }
+
   clearTraining() {
     $('choices').innerHTML = '';
     $('karaoke').classList.add('hidden');
+    $('reading').classList.add('hidden');
     this.hideRing();
   }
 

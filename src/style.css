@@ -241,6 +241,26 @@ html, body {
 .word.active { background: var(--gold); color: var(--ink); border-color: var(--ink); animation: pulse 0.8s ease-in-out infinite; }
 .word.done { background: var(--green); color: #fff; }
 @keyframes pulse { 50% { transform: scale(1.12); } }
+/* המשך קריאת שמע: קטע אחד שמקישים עליו ומסמנים */
+#reading {
+  position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+  width: calc(100vw - 32px); max-width: 760px;
+  background: rgba(255, 248, 231, .97); border: 3px solid var(--navy);
+  border-radius: 22px; box-shadow: var(--shadow); cursor: pointer; overflow: hidden;
+  transition: background .25s, border-color .25s;
+}
+.reading-text {
+  max-height: 42vh; overflow-y: auto; padding: 14px 18px 4px;
+  font-size: 19px; line-height: 1.65; color: var(--ink);
+}
+.reading-text p { margin: 0 0 10px; }
+.reading-text .quiet { font-size: 15px; color: #7b7363; }
+.reading-mark {
+  font-family: 'Secular One'; font-size: 22px; text-align: center; padding: 10px;
+  background: var(--gold); color: var(--ink); border-top: 3px solid var(--navy);
+}
+#reading.done { border-color: var(--green); background: #e6f8ec; }
+#reading.done .reading-mark { background: var(--green); color: #fff; }
 #ring-guide {
   position: absolute; width: 220px; height: 220px; transform: translate(-50%, -50%);
   pointer-events: none;
