@@ -270,6 +270,9 @@ export class Training {
     clearTimeout(this.ringHide); // שההסתרה של הטבעת הקודמת לא תסתיר את החדשה
     const c0 = this.ui.project(centerFn());
     this.ui.showRing(c0.x, c0.y, label(0));
+    // החיצים מסתובבים כמו הרצועה (כלפי חוץ): על יד שמאל המצלמה רואה אותה עם כיוון השעון,
+    // ואצל שמאלי, על יד ימין, בתמונת ראי – נגד כיוון השעון. כף היד והאצבע ממשיכות באותו כיוון
+    this.ui.setRingClockwise(this.side > 0);
 
     return new Promise((resolve) => {
       const angleOf = (p) => {
@@ -390,7 +393,8 @@ export class Training {
     const n = V(-this.side * 0.55, 0, 0.83).normalize();
     const local = V(n.x * 0.077, -0.14, n.z * 0.077);
     const box = createShelYad();
-    await this.dragDrop(box, () => this.wp(shoulder, local), { offsetX: 0.4, offsetY: 0.02 });
+    // התפילין מחכות בצד של היד, הרחק מהגוף (אצל שמאלי – משמאל לזרוע, אחרת הן נבלעות בחזה)
+    await this.dragDrop(box, () => this.wp(shoulder, local), { offsetX: 0.4 * this.side, offsetY: 0.02 });
     await this.attachTo(shoulder, box, local, n);
     this.audio.sfx('snap');
     this.yad = box;

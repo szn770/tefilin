@@ -266,6 +266,8 @@ html, body {
   pointer-events: none;
 }
 #ring-guide svg { width: 100%; height: 100%; overflow: visible; }
+/* נגד כיוון השעון: הטבעת והחץ בתמונת ראי (המספר שמתחת לא מתהפך) */
+#ring-guide.ccw svg { transform: scaleX(-1); }
 .ring-bg { fill: none; stroke: rgba(255,255,255,.55); stroke-width: 14; stroke-dasharray: 10 12; }
 .ring-progress {
   fill: none; stroke: var(--gold); stroke-width: 14; stroke-linecap: round;

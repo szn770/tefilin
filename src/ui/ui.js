@@ -209,6 +209,7 @@ export class UI {
     $('ring-count').textContent = text;
   }
   hideRing() { $('ring-guide').classList.add('hidden'); }
+  setRingClockwise(cw) { $('ring-guide').classList.toggle('ccw', !cw); }
 
   // קטע ארוך (המשך קריאת שמע): מקישים עליו פעם אחת ומסמנים שקראנו
   readBlock(quiet, paragraphs) {
