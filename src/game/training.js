@@ -18,7 +18,7 @@ const raycaster = new THREE.Raycaster();
 const dist2d = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 
 const SPOT = V(1.2, 0, -1.9); // איפה שהמתלמד עומד, מימין לשולחן של מנדי
-const STEPS = 10;
+const STEPS = 11;
 // האצבעות של המתלמד, במרחב המרפק. x לכיוון הגוף מוכפל ב-side. האמצעית היא השנייה
 const FINGERS = [
   { x: -0.047, len: 0.07, tilt: 0.1 },
@@ -31,6 +31,12 @@ const KNUCKLE_Y = -0.372;
 // גבהים על האצבע האמצעית: החלק התחתון (ליד כף היד) והאמצעי
 const LOW = -0.414;
 const MID = -0.449;
+// האות ש' על הזרוע (במרחב הכתף): הלולאה ועוד שתי כריכות נפגשות בנקודה אחת מתחת לזרוע, ליד הבית,
+// ומעליה נפתחות כמו מניפה. SHIN_FAN = כמה כל קו זז לאורך הזרוע בצד העליון: הלולאה, כריכה 1, כריכה 2
+const SHIN_BASE = -0.205;
+const SHIN_FAN = [0.105, 0, -0.095];
+const SHIN_R = 0.088;
+const shinY = (a) => (u) => SHIN_BASE + (a * (1 - Math.cos(u * Math.PI * 2))) / 2;
 
 // גובה הרצועה לפי מספר הסיבובים u, בין נקודות [u, y] (לכריכות שלא יורדות באופן אחיד)
 const lerpKeys = (keys) => (u) => {
@@ -109,6 +115,7 @@ export class Training {
     await this.stepChooseArm();
     await this.stepPlaceYad();
     await this.stepBracha();
+    await this.stepUpperArm();
     await this.stepWrap();
     await this.stepPalm();
     await this.stepRosh();
@@ -157,6 +164,11 @@ export class Training {
   shotHead() {
     const t = this.wp(this.c.head, V(0, 0.12, 0.08));
     this.shot(t, t.clone().addScaledVector(this.fwd(), 1.1).add(V(0, 0.5, 0)));
+  }
+  // הזרוע מלפנים, בניצב לה: מכאן רואים את שלושת הקווים של הש' נפתחים מהנקודה שמתחתיה
+  shotShin() {
+    const arm = this.c.joints['arm' + this.K];
+    this.shot(this.wp(arm, V(0, SHIN_BASE, 0)), this.wp(arm, V(0, SHIN_BASE, 0.8)));
   }
   // מצלמים את כף היד או את האצבע מקרוב, בניצב להן, כדי שיראו את הכריכות לכל אורכן
   shotFingers(y = -0.43, dist = 0.48) {
@@ -399,12 +411,9 @@ export class Training {
     await this.attachTo(shoulder, box, local, n);
     this.audio.sfx('snap');
     this.yad = box;
-    this.yadStrap = strapMesh([
-      local.clone().addScaledVector(n, 0.012).add(V(0, -0.05, 0)),
-      V(n.x * 0.06, -0.24, 0.07),
-      V(0, -0.33, 0.075),
-    ]);
-    shoulder.add(this.yadStrap);
+    // הלולאה מתהדקת סביב הזרוע. היא הקו הראשון של הש'
+    this.loopWrap = new Wrap(shoulder, { radius: SHIN_R, turns: 1, flip: this.flip, yAt: shinY(SHIN_FAN[0]) });
+    await tween(0.3, (k) => this.loopWrap.set(k));
     this.good(`מושלם! ${TEFILLIN_ICON}`, { html: true });
   }
 
@@ -426,14 +435,39 @@ export class Training {
     this.good('אמן! 🙌');
   }
 
+  // הלולאה כבר על הזרוע. עוד שתי כריכות, ושלושת הקווים יוצרים את האות ש'
+  async stepUpperArm() {
+    const shoulder = this.c.joints['arm' + this.K];
+    this.step(4, 'שתי כריכות על הזרוע', 'סובבו פעמיים סביב הזרוע – יחד עם הלולאה זו האות ש׳');
+    this.g.say(this.g.mendy, 'm_upper', { block: false });
+    this.shotShin();
+    await wait(0.5);
+    const [, first, second] = SHIN_FAN;
+    this.upperWrap = new Wrap(shoulder, {
+      radius: SHIN_R, turns: 2, flip: this.flip, yAt: (u) => shinY(u < 1 ? first : second)(u),
+    });
+    await this.circleGesture({
+      centerFn: () => this.wp(shoulder, V(0, SHIN_BASE, 0)),
+      turns: 2,
+      onProgress: (f) => this.upperWrap.set(f),
+      onTurn: (i) => this.audio.sfx('wrap', i),
+    });
+    this.good('יצאה האות ש׳! ✨');
+    await wait(1.1); // שיספיקו לראות את הש' לפני שהמצלמה זזה
+  }
+
   async stepWrap() {
     const { c } = this;
-    this.step(4, 'שבע כריכות', 'סובבו את האצבע סביב הזרוע – 7 פעמים!');
+    this.step(5, 'שבע כריכות', 'סובבו את האצבע סביב היד – 7 פעמים!');
     this.g.say(this.g.mendy, 'm_wrap', { block: false });
     this.shotArm();
     await wait(0.4);
     const elbow = c.joints['elbow' + this.K];
-    this.armWrap = new Wrap(elbow, { yStart: -0.05, yEnd: -0.26, radius: 0.084, turns: 7, flip: this.flip, lead: [V(0, 0.0, 0.08)] });
+    // מהש' הרצועה יורדת לאורך הזרוע, ועוברת את המרפק אל היד
+    const fx = this.fx;
+    this.elbowStrap = strapMesh([V(SHIN_R * fx, SHIN_BASE, 0), V(0.086 * fx, -0.29, 0), V(0.082 * fx, -0.345, 0)]);
+    c.joints['arm' + this.K].add(this.elbowStrap);
+    this.armWrap = new Wrap(elbow, { yStart: -0.05, yEnd: -0.26, radius: 0.084, turns: 7, flip: this.flip, lead: [V(0.082 * fx, 0, 0)] });
     await this.circleGesture({
       centerFn: () => this.wp(elbow, V(0, -0.16, 0)),
       turns: 7,
@@ -450,7 +484,7 @@ export class Training {
   async stepPalm() {
     const { c } = this;
     const title = 'כריכות על כף היד';
-    this.step(5, title, 'קודם חצי כריכה – חצי סיבוב סביב כף היד');
+    this.step(6, title, 'קודם חצי כריכה – חצי סיבוב סביב כף היד');
     this.g.say(this.g.mendy, 'm_palm', { block: false });
     this.shotFingers(-0.36, 0.62);
     await wait(0.45);
@@ -466,7 +500,7 @@ export class Training {
     this.audio.sfx('wrap', 2);
     this.ui.popupCenter('חצי כריכה ✔️', 'good');
     await wait(0.5);
-    this.step(5, title, 'ועכשיו כריכה שלמה – סיבוב אחד מלא');
+    this.step(6, title, 'ועכשיו כריכה שלמה – סיבוב אחד מלא');
     await this.circleGesture({
       centerFn,
       turns: 1,
@@ -479,7 +513,7 @@ export class Training {
 
   async stepRosh() {
     const { c } = this;
-    this.step(6, 'של ראש', 'גררו את התפילין מעל קו השיער, באמצע');
+    this.step(7, 'של ראש', 'גררו את התפילין מעל קו השיער, באמצע');
     this.g.say(this.g.mendy, 'm_rosh', { block: false });
     if (c.hatParts?.length) {
       c.hatParts.forEach((h) => (h.visible = false));
@@ -512,7 +546,7 @@ export class Training {
   // שלוש כריכות על האצבע האמצעית: בחלק התחתון (ליד כף היד), באמצע, ושוב בתחתון
   async stepFinger() {
     const title = 'שלוש כריכות על האצבע';
-    this.step(7, title, 'על האצבע האמצעית: למטה, באמצע, ושוב למטה');
+    this.step(8, title, 'על האצבע האמצעית: למטה, באמצע, ושוב למטה');
     this.g.say(this.g.mendy, 'm_finger', { block: false });
     this.shotFingers();
     await wait(0.6);
@@ -529,7 +563,7 @@ export class Training {
       { y: LOW, hint: 'כריכה שלישית: שוב למטה – ליד כף היד', pop: 'שוב למטה' },
     ];
     for (const [i, p] of places.entries()) {
-      this.step(7, title, p.hint);
+      this.step(8, title, p.hint);
       const posFn = () => this.wp(axis, V(0, p.y, 0));
       const mark = this.addTarget(posFn, 0.032);
       await this.circleGesture({
@@ -550,20 +584,20 @@ export class Training {
   async stepShema() {
     const { c } = this;
     c.setPose('shema', this.side);
-    this.step(8, 'שמע ישראל', 'מכסים את העיניים – הקישו על המילים');
+    this.step(9, 'שמע ישראל', 'מכסים את העיניים – הקישו על המילים');
     this.shotUpper();
     await this.g.say(this.g.mendy, 'm_shema');
     await this.sayWords(SHEMA, 2);
     // הפסוק הראשון מילה במילה, וכל השאר (עד "אמת") כקטע אחד שמסמנים
     c.setPose('armOut', this.side);
-    this.step(8, 'שמע ישראל', 'עכשיו ממשיכים עד "אמת" – הקישו על הקטע כשסיימתם');
+    this.step(9, 'שמע ישראל', 'עכשיו ממשיכים עד "אמת" – הקישו על הקטע כשסיימתם');
     await this.ui.readBlock(SHEMA_QUIET, SHEMA_REST);
     this.good('שמע ישראל! 💙');
   }
 
   async stepRemove() {
     const { c } = this;
-    this.step(9, 'חולצים בסדר הפוך', 'מה מורידים קודם?');
+    this.step(10, 'חולצים בסדר הפוך', 'מה מורידים קודם?');
     this.g.say(this.g.mendy, 'm_remove', { block: false });
     this.shotUpper();
     await wait(0.4);
@@ -593,7 +627,11 @@ export class Training {
     const aw = this.armWrap;
     await tween(0.5, (k) => aw.set(1 - k));
     aw.dispose();
-    this.yadStrap.removeFromParent();
+    this.elbowStrap.removeFromParent();
+    const uw = this.upperWrap;
+    await tween(0.25, (k) => uw.set(1 - k));
+    uw.dispose();
+    this.loopWrap.dispose();
     await this.flyAway(this.yad);
 
     c.rollSleeve(this.side, false);
@@ -606,7 +644,7 @@ export class Training {
   async stepLechaim() {
     const { c } = this;
     const g = this.g;
-    this.step(10, 'לחיים!', 'מה מגישים?');
+    this.step(11, 'לחיים!', 'מה מגישים?');
     this.shotStand();
     await g.say(g.mendy, 'm_lechaim');
     const treat = await this.ui.choices(TREATS);

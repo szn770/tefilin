@@ -21,6 +21,7 @@ export const LINES = [
   // ---- הדרכה: מניחים תפילין צעד אחר צעד ----
   { id: 'm_learn', voices: ['mendy'], text: 'בוא, נלמד ביחד להניח תפילין!', say: 'בּוֹא, נִלְמַד בְּיַחַד לְהָנִיחַ תְּפִלִּין!' },
   { id: 'm_repeat', voices: ['mendy'], text: 'תגיד אחריי את הברכה', say: 'תַּגִּיד אַחֲרַי אֶת הַבְּרָכָה' },
+  { id: 'm_upper', voices: ['mendy'], text: 'שתי כריכות על הזרוע, ויחד עם הלולאה נוצרת האות שין', say: 'שְׁתֵּי כְּרִיכוֹת עַל הַזְּרוֹעַ, וְיַחַד עִם הַלּוּלָאָה נוֹצֶרֶת הָאוֹת שִׁין' },
   { id: 'm_wrap', voices: ['mendy'], text: 'עכשיו שבע כריכות!', say: 'עַכְשָׁו שֶׁבַע כְּרִיכוֹת!' },
   { id: 'm_rosh', voices: ['mendy'], text: 'עכשיו של ראש – מעל השיער', say: 'עַכְשָׁו שֶׁל רֹאשׁ, מֵעַל הַשֵּׂעָר' },
   { id: 'm_palm', voices: ['mendy'], text: 'עכשיו על כף היד: חצי כריכה, וכריכה שלמה', say: 'עַכְשָׁו עַל כַּף הַיָּד: חֲצִי כְּרִיכָה, וּכְרִיכָה שְׁלֵמָה' },
@@ -77,5 +78,5 @@ export const SHEMA = ['w_shema', 'w_yisrael', 'w_hashem', 'w_elokeinu', 'w_hashe
 // מה שנשמע בהדרכה, לפי הסדר. npm run voices:training מקליט רק את אלה
 export const TRAINING_LINE_IDS = [
   'm_learn', 'c_righty', 'c_lefty', 'm_repeat', ...new Set([...BRACHA, ...SHEMA]),
-  'm_wrap', 'm_palm', 'm_rosh', 'm_finger', 'm_shema', 'm_remove', 'm_lechaim', 'c_thanks', 'm_mazal',
+  'm_upper', 'm_wrap', 'm_palm', 'm_rosh', 'm_finger', 'm_shema', 'm_remove', 'm_lechaim', 'c_thanks', 'm_mazal',
 ];

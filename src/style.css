@@ -261,6 +261,10 @@ html, body {
   font-family: 'Secular One'; font-size: 22px; text-align: center; padding: 10px;
   background: var(--gold); color: var(--ink); border-top: 3px solid var(--navy);
 }
+.keys-hint { flex-basis: 100%; display: block; text-align: center; font-family: 'Rubik'; font-size: 14px; color: #7b7363; }
+.reading-mark .keys-hint { color: var(--ink); opacity: .75; }
+/* בטלפון אין מקלדת */
+@media (hover: none) { .keys-hint { display: none; } }
 #reading.done { border-color: var(--green); background: #e6f8ec; }
 #reading.done .reading-mark { background: var(--green); color: #fff; }
 #ring-guide {

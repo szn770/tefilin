@@ -181,18 +181,33 @@ export class UI {
       box.appendChild(el);
       return el;
     });
+    box.insertAdjacentHTML('beforeend', '<div class="keys-hint">אפשר גם בחיצים במקלדת</div>');
     return new Promise((resolve) => {
-      els.forEach((el, i) => {
-        el.onpointerdown = () => {
-          if (i !== idx) return onWord?.(i, false);
-          el.classList.replace('active', 'done');
-          onWord?.(i, true);
-          idx++;
-          if (idx < els.length) els[idx].classList.add('active');
-          else wait(0.35).then(() => { box.classList.add('hidden'); resolve(); });
-        };
-      });
+      const press = (i) => {
+        if (i !== idx) return onWord?.(i, false);
+        els[i].classList.replace('active', 'done');
+        onWord?.(i, true);
+        idx++;
+        if (idx < els.length) els[idx].classList.add('active');
+        else {
+          stop();
+          wait(0.35).then(() => { box.classList.add('hidden'); resolve(); });
+        }
+      };
+      els.forEach((el, i) => { el.onpointerdown = () => press(i); });
+      const stop = this.onArrows(() => press(idx));
     });
+  }
+
+  // חיצי המקלדת, למי שמשחק במחשב. fn מקבל את שם המקש, ומוחזרת פונקציה שמפסיקה להאזין
+  onArrows(fn) {
+    const handler = (e) => {
+      if (!e.key.startsWith('Arrow')) return;
+      e.preventDefault();
+      if (!e.repeat) fn(e.key);
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
   }
 
   // טבעת שמראה כמה סיבובים כבר עשו (כריכות)
@@ -217,17 +232,26 @@ export class UI {
   readBlock(quiet, paragraphs) {
     const box = $('reading');
     box.innerHTML = `<div class="reading-text"><p class="quiet">${quiet}</p>${paragraphs.map((p) => `<p>${p}</p>`).join('')}</div>`
-      + '<div class="reading-mark">הקישו כדי לסמן שקראנו ✓</div>';
+      + '<div class="reading-mark">הקישו כדי לסמן שקראנו ✓<small class="keys-hint">או חץ ימינה / שמאלה. חץ למטה גולל את הטקסט</small></div>';
     box.classList.remove('hidden', 'done');
-    box.querySelector('.reading-text').scrollTop = 0;
+    const text = box.querySelector('.reading-text');
+    text.scrollTop = 0;
+    const shownAt = performance.now();
     return new Promise((resolve) => {
-      // click ולא pointerdown, כדי שגלילה בטקסט לא תסמן אותו
-      box.onclick = () => {
+      const mark = () => {
         box.onclick = null;
+        stop();
         box.classList.add('done');
         box.querySelector('.reading-mark').textContent = 'קראנו! ✓';
         wait(0.7).then(() => { box.classList.add('hidden'); resolve(); });
       };
+      // click ולא pointerdown, כדי שגלילה בטקסט לא תסמן אותו
+      box.onclick = mark;
+      const stop = this.onArrows((key) => {
+        if (key === 'ArrowUp' || key === 'ArrowDown') text.scrollBy({ top: key === 'ArrowDown' ? 90 : -90 });
+        // מי שהמשיך ללחוץ אחרי המילה האחרונה לא יסמן את הקטע בלי לראות אותו
+        else if (performance.now() - shownAt > 600) mark();
+      });
     });
   }
 
