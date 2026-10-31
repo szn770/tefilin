@@ -71,7 +71,8 @@ async function boot() {
   const muteBtn = document.getElementById('btn-mute');
   muteBtn.onclick = () => {
     audio.setMuted(!audio.muted);
-    muteBtn.textContent = audio.muted ? '🔇' : '🔊';
+    document.getElementById('mute-ico').textContent = audio.muted ? '🔇' : '🔊';
+    muteBtn.setAttribute('aria-pressed', !audio.muted);
   };
   document.getElementById('btn-nigun').onclick = () => game.perks.useNigun();
   document.getElementById('btn-flyers').onclick = () => game.perks.useFlyers();
@@ -83,6 +84,7 @@ async function boot() {
   const setPaused = (on) => {
     paused = on;
     document.getElementById('screen-pause').classList.toggle('hidden', !on);
+    if (on) document.getElementById('btn-resume').focus();
     if (audio.ctx) (on ? audio.ctx.suspend() : audio.ctx.resume()).catch(() => {});
   };
   document.getElementById('btn-pause').onclick = () => setPaused(true);
@@ -92,6 +94,22 @@ async function boot() {
   // מי שעובר ללשונית או לאפליקציה אחרת באמצע שלב, חוזר למשחק עצור
   document.addEventListener('visibilitychange', () => {
     if (document.hidden && game.state === 'day') setPaused(true);
+  });
+
+  // ---- מקלדת ----
+  window.addEventListener('keydown', (e) => {
+    // כפתור שכבר נעלם מהמסך לא תופס את המקשים
+    const field = e.target.closest?.('input, textarea, button, a');
+    if (game.state !== 'day' || paused || game.input || field?.getClientRects().length) return;
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (!e.repeat) game.keyMove(e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 1);
+    } else if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      if (!e.repeat) game.keyAct();
+    } else if (e.key === 'Escape' || e.key === 'p') {
+      setPaused(true);
+    }
   });
 
   // ---- לולאה ----

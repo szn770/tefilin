@@ -366,6 +366,7 @@ export class UI {
     const screen = $('screen-intro');
     screen.classList.remove('hidden');
     return new Promise((resolve) => {
+      $('btn-go').focus({ preventScroll: true }); // למי שמשחק במקלדת: Enter ממשיך
       $('btn-go').onclick = () => {
         screen.classList.add('hidden');
         resolve();
@@ -433,6 +434,7 @@ export class UI {
     render();
     screen.classList.remove('hidden');
     return new Promise((resolve) => {
+      $('btn-next').focus({ preventScroll: true });
       $('btn-next').onclick = () => {
         screen.classList.add('hidden');
         resolve();

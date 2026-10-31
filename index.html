@@ -2,7 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>הנחת?! – מבצע תפילין</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -10,7 +10,8 @@
 </head>
 <body>
   <div id="app">
-    <canvas id="game"></canvas>
+    <canvas id="game" role="img" aria-label="רחוב עם דוכן תפילין ועוברים ושבים"></canvas>
+    <div id="key-marker" class="hidden" aria-hidden="true"></div>
 
     <!-- תגיות ובועות שעוקבות אחרי הדמויות -->
     <div id="tags"></div>
@@ -52,22 +53,22 @@
         <span class="ico">🗑️</span>
         <span id="trash-val">0</span>
       </div>
-      <button id="btn-mute" class="round-btn" title="שמע">🔊</button>
-      <button id="btn-pause" class="round-btn" title="הפסקה ותפריט">II</button>
+      <button id="btn-mute" class="round-btn" title="שמע" aria-label="שמע" aria-pressed="true"><span id="mute-ico" aria-hidden="true">🔊</span></button>
+      <button id="btn-pause" class="round-btn" title="הפסקה ותפריט" aria-label="הפסקה ותפריט"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg></button>
     </div>
 
     <!-- כפתורי פעולה (שדרוגים) -->
-    <button id="btn-nigun" class="hidden" title="ניגון – מאט את כולם">
+    <button id="btn-nigun" class="hidden" title="ניגון – מאט את כולם" aria-label="ניגון, מאט את כולם">
       <span class="nigun-fill" id="nigun-fill"></span>
       <span class="nigun-ico">🎵</span>
     </button>
-    <button id="btn-flyers" class="hidden" title="עלונים – כל הממהרים שבמסך עוצרים לקרוא, ומספיקה להם לחיצה אחת">
+    <button id="btn-flyers" class="hidden" title="עלונים – כל הממהרים שבמסך עוצרים לקרוא, ומספיקה להם לחיצה אחת" aria-label="עלונים">
       <span class="nigun-ico">📄</span>
       <b id="flyers-val">0</b>
     </button>
 
     <!-- הדרכה: יציאה, כפתורי בחירה, מילים להקשה וטבעת לכריכות -->
-    <button id="btn-learn-exit" class="round-btn hidden" title="יציאה מההדרכה">🏠</button>
+    <button id="btn-learn-exit" class="round-btn hidden" title="יציאה מההדרכה" aria-label="יציאה מההדרכה"><span aria-hidden="true">🏠</span></button>
     <div id="choices"></div>
     <div id="karaoke" class="hidden"></div>
     <div id="reading" class="hidden"></div>
@@ -98,6 +99,7 @@
           <li><span>🙅</span>לא קוראים לנשים ולילדים – זה מוריד נחת ולב ❤️. בלי לבבות – השלב נגמר!</li>
           <li><span>🏪</span>בדוכן יש מקום מוגבל – קונים עוד תפילין, דוכנים ושלוחים</li>
           <li><span>🌅</span>כל שלב נגמר בשקיעה, ובכל שלב יש הפתעה חדשה</li>
+          <li><span>⌨️</span>במקלדת: חיצים בוחרים, רווח לוחץ, Esc עוצר את המשחק</li>
         </ul>
         <button class="big-btn hidden" id="btn-continue">המשך</button>
         <button class="big-btn" id="btn-start">יאללה, מתחילים!</button>
@@ -228,7 +230,7 @@
           <label class="auth-field">סיסמה
             <span class="auth-pass">
               <input id="auth-pass" type="password" autocomplete="new-password" />
-              <button type="button" id="auth-eye" title="הצגת הסיסמה">👁️</button>
+              <button type="button" id="auth-eye" title="הצגת הסיסמה" aria-label="הצגת הסיסמה">👁️</button>
             </span>
           </label>
           <div class="auth-hint" id="auth-hint"></div>

@@ -264,6 +264,18 @@ export class Hazards {
     return best;
   }
 
+  // כל מה שאפשר ללחוץ עליו עכשיו, לבחירה במקלדת
+  targets() {
+    const list = [];
+    for (const pg of this.pigeons) {
+      if (pg.landed && !pg.flying) list.push({ kind: 'pigeon', obj: pg, world: pg.obj.position.clone().add(V(0, 0.15, 0)) });
+    }
+    for (const t of this.trash) list.push({ kind: 'trash', obj: t, world: t.obj.position });
+    const ins = this.inspector;
+    if (ins && !ins.done) list.push({ kind: 'inspector', obj: ins, world: ins.worldPoint(ins.root, V(0, 1.1, 0)) });
+    return list;
+  }
+
   handle(hit) {
     if (hit.kind === 'trash') this.pickUpTrash(hit.obj);
     else if (hit.kind === 'pigeon') this.shooPigeon(hit.obj);

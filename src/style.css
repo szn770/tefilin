@@ -21,7 +21,6 @@ html, body {
   color: var(--ink);
   user-select: none;
   -webkit-user-select: none;
-  touch-action: none;
 }
 
 #app { position: fixed; inset: 0; }
@@ -506,3 +505,11 @@ input, textarea, select { user-select: text; -webkit-user-select: text; touch-ac
   #ring-guide { width: 170px; height: 170px; }
   .ring-count { font-size: 30px; }
 }
+
+/* סימון מי שנבחר במקלדת */
+#key-marker { position: fixed; left: 0; top: 0; z-index: 9; width: 0; height: 0; pointer-events: none; }
+#key-marker::after { content: ''; position: absolute; left: -17px; top: 0; border: 17px solid transparent; border-top: 28px solid #ffc83d; filter: drop-shadow(0 0 1px #1d3a8f) drop-shadow(0 2px 0 #1d3a8f); }
+
+/* המחוות שייכות לאזור המשחק בלבד, כדי שבתפריטים אפשר יהיה להגדיל את התצוגה בצביטה */
+html { touch-action: manipulation; }
+#game { touch-action: none; }

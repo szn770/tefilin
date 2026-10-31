@@ -13,6 +13,7 @@ import { wait } from '../engine/tween.js';
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
 const LANE_Z = [0.1, 1.9];
 const SAVE_KEY = 'hanachta-save-v1';
+const canCall = (p) => (p.mode === 'walk' || p.fromBus) && !p.called && !p.penalized;
 const SERVE_SPEED = [1, 1.2, 1.45, 1.75]; // לפי רמת הכשרת השלוחים
 // שלט: כל רמה מורידה לחיצות לסוג אחר של ממהרים
 const SIGN_RELIEF = { rushed: 1, first: 2, runner: 3 };
@@ -52,6 +53,10 @@ export class Game {
     Object.assign(this, { scene, camera, ui, audio, world, fx, canvas });
     this.rig = new CameraRig(camera);
     this.raycaster = new THREE.Raycaster();
+    this.keyMarker = document.getElementById('key-marker');
+    this.keyMode = false;
+    this.keyFocus = null;
+    this.keyX = 0;
     this.peds = [];
     this.state = 'menu';
     this.time = 0;
@@ -494,7 +499,7 @@ export class Game {
 
   // ---------- קלט ----------
   pickPed(p) {
-    const candidates = this.peds.filter((x) => (x.mode === 'walk' || x.fromBus) && !x.called && !x.penalized);
+    const candidates = this.peds.filter(canCall);
     this.raycaster.setFromCamera(p.ndc, this.camera);
     const hit = this.raycaster.intersectObjects(candidates.map((x) => x.hitbox), false)[0];
     if (hit) return hit.object.userData.person;
@@ -511,6 +516,7 @@ export class Game {
   // בהדרכה, כל שלב קובע בעצמו מה עושה לחיצה (this.input)
   onDown(p) {
     this.audio.init();
+    this.keyMode = false;
     if (this.input?.down) return this.input.down(p);
     if (this.state !== 'day') return;
     const hz = this.hazards.pick(p);
@@ -524,8 +530,49 @@ export class Game {
   }
   onUp(p) { this.input?.up?.(p); }
 
+  // ---------- מקלדת ----------
+  // למי שלא משתמש בעכבר או במסך מגע: חיצים עוברים בין מה שאפשר ללחוץ עליו, ורווח או Enter לוחצים
+  keyTargets() {
+    const peds = this.peds.filter(canCall).map((ped) => ({ ped, world: ped.worldPoint(ped.root, V(0, 1.1, 0)) }));
+    return [...this.hazards.targets(), ...peds]
+      .map((t) => ({ ...t, x: this.ui.project(t.world).x }))
+      .sort((a, b) => a.x - b.x);
+  }
+  keyMove(step) {
+    this.audio.init();
+    this.keyMode = true;
+    const list = this.keyTargets();
+    if (!list.length) return;
+    const i = list.findIndex((t) => (t.ped ?? t.obj) === this.keyFocus);
+    const next = i < 0 ? list[Math.floor(list.length / 2)] : list[(i + step + list.length) % list.length];
+    this.keyFocus = next.ped ?? next.obj;
+  }
+  // לחיצה רק על מי שמסומן: בלי סימון רואים קודם את מי בוחרים, כדי לא לקרוא בטעות
+  keyAct() {
+    const t = this.keyTargets().find((x) => (x.ped ?? x.obj) === this.keyFocus);
+    if (!t) { this.keyMove(0); return; }
+    this.audio.init();
+    this.keyMode = true;
+    if (t.ped) this.tapPed(t.ped);
+    else this.hazards.handle(t);
+  }
+  updateKeyMarker() {
+    const el = this.keyMarker;
+    const list = this.keyMode && this.state === 'day' && !this.input ? this.keyTargets() : [];
+    let t = list.find((x) => (x.ped ?? x.obj) === this.keyFocus);
+    // מי שסומן הלך או נקרא: הסימון עובר למי שהכי קרוב אליו
+    if (!t && list.length) t = list.reduce((a, b) => (Math.abs(a.x - this.keyX) < Math.abs(b.x - this.keyX) ? a : b));
+    el.classList.toggle('hidden', !t);
+    if (!t) { this.keyFocus = null; return; }
+    this.keyFocus = t.ped ?? t.obj;
+    this.keyX = t.x;
+    const s = this.ui.project(t.world);
+    el.style.transform = `translate(${s.x}px, ${s.y - 96}px)`;
+  }
+
   // ---------- לולאה ----------
   update(dt) {
+    this.updateKeyMarker();
     if (this.state === 'day') {
       const L = this.level;
       this.time = Math.min(L.time, this.time + dt);
