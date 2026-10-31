@@ -1,5 +1,11 @@
 import { LINE_BY_ID } from '../data/lines.js';
 
+// רטט בטלפון: רק באירועים שחשוב להרגיש, ולא בכל צליל
+const HAPTICS = {
+  tap: 10, call: 15, pickup: 15, ding: 20, buzz: 60, sad: 120, fine: 200,
+  success: [30, 40, 30], wrong: [90, 60, 90], fanfare: [40, 40, 40, 40, 120],
+};
+
 // אפקטים מסונתזים + קולות מוקלטים (נוצרים עם ElevenLabs ע"י npm run voices).
 // אם אין קבצי קול, המשחק עובד עם בועות טקסט בלבד.
 
@@ -150,6 +156,7 @@ export class GameAudio {
   }
 
   sfx(name, arg = 0) {
+    if (HAPTICS[name]) navigator.vibrate?.(HAPTICS[name]);
     if (!this.ctx || this.muted) return;
     switch (name) {
       case 'pop': this.tone(520, 0.1, { slide: 1100, vol: 0.35 }); break;
