@@ -170,8 +170,8 @@ export class Training {
     const arm = this.c.joints['arm' + this.K];
     this.shot(this.wp(arm, V(0, SHIN_BASE, 0)), this.wp(arm, V(0, SHIN_BASE, 0.8)));
   }
-  // מצלמים את כף היד או את האצבע מקרוב, בניצב להן, כדי שיראו את הכריכות לכל אורכן
-  shotFingers(y = -0.43, dist = 0.48) {
+  // מצלמים את היד מקרוב, בניצב לה, כדי שיראו את הכריכות לכל אורכן. y = המקום לאורך היד
+  shotClose(y = -0.43, dist = 0.48) {
     const t = this.wp(this.fingerAxis, V(0, y, 0));
     const along = this.wp(this.fingerAxis, V(0, y - 0.07, 0)).sub(t).normalize();
     const dir = this.fwd().add(V(0, 0.35, 0)).addScaledVector(along, -this.fwd().add(V(0, 0.35, 0)).dot(along)).normalize();
@@ -456,29 +456,44 @@ export class Training {
     await wait(1.1); // שיספיקו לראות את הש' לפני שהמצלמה זזה
   }
 
+  // שבע כריכות לפי מנהג חב"ד: חצי, 2 שלמות, רווח, 4 שלמות וחצי. ביחד 6 שלמות ו-2 חצאים
   async stepWrap() {
     const { c } = this;
-    this.step(5, 'שבע כריכות', 'סובבו את האצבע סביב היד – 7 פעמים!');
+    const title = 'שבע כריכות על היד';
+    this.step(5, title, 'קודם חצי כריכה, מיד מתחת למרפק');
     this.g.say(this.g.mendy, 'm_wrap', { block: false });
-    this.shotArm();
+    this.shotClose(-0.17, 0.85);
     await wait(0.4);
     const elbow = c.joints['elbow' + this.K];
     // מהש' הרצועה יורדת לאורך הזרוע, ועוברת את המרפק אל היד
     const fx = this.fx;
     this.elbowStrap = strapMesh([V(SHIN_R * fx, SHIN_BASE, 0), V(0.086 * fx, -0.29, 0), V(0.082 * fx, -0.345, 0)]);
     c.joints['arm' + this.K].add(this.elbowStrap);
-    this.armWrap = new Wrap(elbow, { yStart: -0.05, yEnd: -0.26, radius: 0.084, turns: 7, flip: this.flip, lead: [V(0.082 * fx, 0, 0)] });
-    await this.circleGesture({
-      centerFn: () => this.wp(elbow, V(0, -0.16, 0)),
-      turns: 7,
-      onProgress: (f) => this.armWrap.set(f),
-      onTurn: (i) => {
-        this.audio.sfx('wrap', i);
-        const p = this.ui.project(this.wp(elbow, V(0, -0.16, 0)));
-        this.ui.popup(`${i}`, p.x, p.y - 120, 'good');
-      },
-    });
-    this.good('שבע! 💪');
+    // הרווח נוצר בתחילת הסיבוב השלישי, כשהרצועה בצד האחורי של היד. מלפנים רואים רק רווח נקי
+    const keys = [[0, -0.045], [0.5, -0.062], [2.5, -0.105], [2.9, -0.15], [6.5, -0.238], [7, -0.262]];
+    this.armWrap = new Wrap(elbow, { radius: 0.084, turns: 7, flip: this.flip, yAt: lerpKeys(keys), lead: [V(0.082 * fx, 0, 0)] });
+    const parts = [
+      { turns: 0.5, y: -0.055, label: () => '½' },
+      { turns: 2, y: -0.085, label: (n) => `${n}/2`, hint: 'עכשיו 2 כריכות שלמות' },
+      { turns: 4, y: -0.195, label: (n) => `${n}/4`, hint: 'משאירים רווח, ועוד 4 כריכות שלמות' },
+      { turns: 0.5, y: -0.25, label: () => '½', hint: 'ועוד חצי כריכה, לכיוון כף היד' },
+    ];
+    let done = 0;
+    for (const p of parts) {
+      if (p.hint) this.step(5, title, p.hint);
+      const from = done;
+      await this.circleGesture({
+        centerFn: () => this.wp(elbow, V(0, p.y, 0)),
+        turns: p.turns,
+        label: p.label,
+        onProgress: (f) => this.armWrap.set((from + f * p.turns) / 7),
+        onTurn: () => this.audio.sfx('wrap', Math.ceil(this.armWrap.progress * 7)),
+      });
+      done += p.turns;
+      if (p.turns < 1) this.audio.sfx('wrap', Math.ceil(done)); // בחצי כריכה אין סיבוב שלם שישמיע צליל
+      await wait(0.3);
+    }
+    this.good('6 שלמות ו-2 חצאים: שבע! 💪');
   }
 
   async stepPalm() {
@@ -486,7 +501,7 @@ export class Training {
     const title = 'כריכות על כף היד';
     this.step(6, title, 'קודם חצי כריכה – חצי סיבוב סביב כף היד');
     this.g.say(this.g.mendy, 'm_palm', { block: false });
-    this.shotFingers(-0.36, 0.62);
+    this.shotClose(-0.36, 0.62);
     await wait(0.45);
     const elbow = c.joints['elbow' + this.K];
     // ממשיכה מהמקום שבו נגמרו שבע הכריכות: חצי סיבוב ועוד סיבוב שלם
@@ -548,7 +563,7 @@ export class Training {
     const title = 'שלוש כריכות על האצבע';
     this.step(8, title, 'על האצבע האמצעית: למטה, באמצע, ושוב למטה');
     this.g.say(this.g.mendy, 'm_finger', { block: false });
-    this.shotFingers();
+    this.shotClose();
     await wait(0.6);
     const axis = this.fingerAxis;
     const keys = [[0, LOW], [0.85, LOW], [1.15, MID], [1.85, MID], [2.15, LOW - 0.005], [3, LOW - 0.005]];
