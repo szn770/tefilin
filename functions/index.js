@@ -1,7 +1,7 @@
 // הכתובת הזו עברה לאתר ילד שעשועים. רק האתר, שמביא מכאן את המשחק ומזדהה עם HUB_KEY, מקבל את המשחק.
 // כל מי שנכנס ישירות מקבל דף שלוקח איתו את ההתקדמות מהדפדפן ומעביר אותו לאתר.
 // רק הדף הראשי עובר כאן, כדי שקובצי המשחק לא ייספרו כבקשות לשרת.
-const TARGET = 'https://yeledshaashuim.com/?play=hanachat';
+const TARGET = 'https://yeledshaashuim.com/';
 
 const PAGE = `<!doctype html>
 <html lang="he" dir="rtl">
@@ -20,14 +20,14 @@ const PAGE = `<!doctype html>
 <body>
 <p>המשחק עבר לאתר ילד שעשועים:<br><a id="go" href="${TARGET}">yeledshaashuim.com</a></p>
 <script>
-  // לוקחים את השלב, הניקוד והשדרוגים
+  // כולם נוחתים בדף הבית ובוחרים שם משחק. השלב, הניקוד והשדרוגים מגיעים איתם ומחכים לפתיחת המשחק
   (function () {
     var url = '${TARGET}';
     try {
       var save = JSON.parse(localStorage.getItem('hanachta-save-v1') || 'null');
       if (save) {
         var keep = { levelIndex: save.levelIndex, stars: save.stars, score: save.score, upgrades: save.upgrades };
-        url += '#carry=' + encodeURIComponent(JSON.stringify(keep));
+        url += '?from=hanachat#carry=' + encodeURIComponent(JSON.stringify(keep));
       }
     } catch (e) { /* אין גישה לאחסון: פשוט עוברים */ }
     document.getElementById('go').href = url;
