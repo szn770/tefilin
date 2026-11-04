@@ -11,6 +11,9 @@
 //   --dry-run         רק להציג מה יוקלט, בלי לשלוח בקשות
 //   --list-voices     להציג את הקולות שזמינים בחשבון (כדי לבחור קולות ב-tools/voices.json)
 //   --review          רק לבנות את דף ההאזנה tools/review.html, בלי לפנות ל-ElevenLabs (npm run voices:review)
+//
+// הקלטות שהוקלטו ידנית ב-ElevenLabs רשומות ב-tools/hand-recorded.json, והסקריפט לא דורס אותן גם עם --force.
+// כדי להקליט אחת מהן מחדש אוטומטית, מוחקים אותה מהרשימה.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -37,10 +40,13 @@ const SFX = [
 const SPEAKERS = { mendy: 'מנדי', man: 'המתלמד', man2: 'עובר אורח', oldman: 'סבא', woman: 'אישה' };
 // השמות של הקולות המוכנים ב-ElevenLabs, כדי שיהיה קל למצוא אותם שם
 const VOICE_NAMES = {
+  l7Q9rbdCC6j3J5dNlOOg: 'Itamar', ZiofZHcEBTn5sRySe5h8: 'Nimrod',
   TX3LPaxmHKxFdv7VOQHJ: 'Liam', iP95p4xoKVk53GoZ742B: 'Chris', cjVigY5qzO86Huf0OWal: 'Eric',
   pqHfZKP75CvOlQylNhV4: 'Bill', EXAVITQu4vr4xnSDxMaL: 'Sarah',
 };
 const TRAINING_VOICES = ['mendy', 'man']; // בהדרכה המתלמד מדבר תמיד בקול man
+const HAND_FILE = path.join(ROOT, 'tools', 'hand-recorded.json');
+const HAND = new Set(fs.existsSync(HAND_FILE) ? JSON.parse(fs.readFileSync(HAND_FILE, 'utf8')) : []);
 
 main().catch((e) => {
   console.error(`\n✖ ${e.message}`);
@@ -69,8 +75,10 @@ async function main() {
       jobs.push({ line, voice: v, file: path.join(OUT, 'voice', file) });
     }
   }
-  const todo = jobs.filter((j) => flag('force') || !fs.existsSync(j.file));
+  const hand = jobs.filter((j) => HAND.has(path.basename(j.file, '.mp3')));
+  const todo = jobs.filter((j) => !hand.includes(j) && (flag('force') || !fs.existsSync(j.file)));
   console.log(`🎙️  ${todo.length} הקלטות לביצוע (מתוך ${jobs.length}), מודל: ${model}`);
+  if (hand.length) console.log(`  ✋ ${hand.length} הוקלטו ידנית ונשארות כמו שהן (tools/hand-recorded.json)`);
   if (flag('dry-run')) {
     for (const j of todo) console.log(`  ${path.basename(j.file)}  [${j.voice}]  ${j.line.say ?? j.line.text}`);
     return;
@@ -177,11 +185,11 @@ function writeReview() {
       title: 'ההדרכה, לפי הסדר',
       rows: TRAINING_LINE_IDS.filter((id) => !words.has(id)).flatMap((id) => LINE_BY_ID[id].voices.filter((v) => TRAINING_VOICES.includes(v)).map((v) => row(LINE_BY_ID[id], v))),
     },
-    { title: 'הברכה, מילה במילה', rows: BRACHA.map((id) => row(LINE_BY_ID[id], 'mendy')) },
-    { title: 'שמע ישראל, מילה במילה (ה׳ ואלוקינו נשמעות מההקלטות של הברכה)', rows: SHEMA.filter((id) => !BRACHA.includes(id)).map((id) => row(LINE_BY_ID[id], 'mendy')) },
+    { title: 'הברכה, מילה במילה (נחתכו מהקלטה של הברכה המלאה, בשביל הנגנה טבעית)', rows: BRACHA.map((id) => row(LINE_BY_ID[id], 'mendy')) },
+    { title: 'שמע ישראל, מילה במילה (נחתכו מהקלטה של הפסוק המלא. ה׳ ואלוקינו נשמעות מההקלטות של הברכה)', rows: SHEMA.filter((id) => !BRACHA.includes(id)).map((id) => row(LINE_BY_ID[id], 'mendy')) },
   ];
   const shown = new Set(groups.flatMap((g) => g.rows.map((r) => r.name)));
-  groups.push({ title: 'מוקלטים, אבל לא נשמעים כרגע (במשחק הרגיל אין קולות)', rows: LINES.flatMap((l) => l.voices.map((v) => row(l, v))).filter((r) => !shown.has(r.name)) });
+  groups.push({ title: 'מוקלטים, אבל לא נשמעים כרגע (במשחק הרגיל אין קולות)', old: true, rows: LINES.flatMap((l) => l.voices.map((v) => row(l, v))).filter((r) => !shown.has(r.name)) });
   groups.push({ title: 'מוזיקה', rows: [{ text: 'הניגון של כפתור הרמקול', say: '', voice: '', name: 'nigun', dir: 'sfx' }] });
 
   let n = 0;
@@ -190,8 +198,12 @@ function writeReview() {
     if (!rows.length) return '';
     return `<tr class="g"><th colspan="7">${esc(g.title)}</th></tr>\n` + rows.map((r) => {
       const id = voices[r.voice];
-      const who = r.voice ? `${SPEAKERS[r.voice]}<small>${esc(VOICE_NAMES[id] ?? id)}</small>` : '';
-      return `<tr data-name="${r.name}.mp3"><td class="n">${++n}</td><td><input type="checkbox" class="mark" aria-label="נשמע מוזר"></td>`
+      // ✋ = הקלטה ידנית (tools/hand-recorded.json). 🤖 = נוצרה אוטומטית בסקריפט, ושווה להקשיב לה
+      const hand = HAND.has(r.name);
+      const auto = r.voice && !hand && !g.old;
+      const badge = hand ? '<span class="badge hand">✋ הקלטה שלך</span>' : auto ? '<span class="badge auto">🤖 נוצרה אוטומטית</span>' : '';
+      const who = r.voice ? `${SPEAKERS[r.voice]}<small>${esc(VOICE_NAMES[id] ?? id)}</small>${badge}` : '';
+      return `<tr data-name="${r.name}.mp3"${auto ? ' class="auto"' : ''}><td class="n">${++n}</td><td><input type="checkbox" class="mark" aria-label="נשמע מוזר"></td>`
         + `<td class="t">${esc(r.text)}</td><td class="say copy" title="לחיצה מעתיקה">${esc(r.say)}</td><td class="who">${who}</td>`
         + `<td><audio controls preload="none" src="../public/audio/${r.dir}/${r.name}.mp3"></audio></td>`
         + `<td><button class="name" title="העתקת שם הקובץ">${r.name}.mp3</button></td></tr>`;
@@ -216,6 +228,9 @@ td.n{color:#5f6d96;width:2.5em}
 td.t{font-size:24px;font-weight:700}
 td.say{font-size:22px;cursor:copy}
 td.who small{display:block;color:#5f6d96}
+.badge{display:inline-block;margin-top:4px;padding:2px 8px;border-radius:999px;font-size:13px;white-space:nowrap}
+.badge.hand{background:#ddf5e6;color:#1d7a46}
+.badge.auto{background:#fff0c9;color:#8a5a00}
 .mark{width:22px;height:22px;accent-color:#d94a6f}
 tr.marked{background:#fde5ec}
 tr.on{background:#fff3c4}
@@ -224,11 +239,12 @@ button.name{font-family:monospace;font-size:14px;padding:6px 10px;border:1px sol
 </style></head>
 <body>
 <header><h1>כל ההקלטות במשחק</h1>
-  <button id="all">▶ הכול ברצף</button><button id="onlyMarked">▶ רק המסומנים</button><button id="stop">⏹ עצירה</button>
+  <button id="all">▶ הכול ברצף</button><button id="onlyAuto">▶ רק מה שנוצר אוטומטית</button><button id="onlyMarked">▶ רק המסומנים</button><button id="stop">⏹ עצירה</button>
   <button id="copyList">העתקת רשימת המסומנים</button><span class="count" id="count"></span></header>
 <div class="help">
+  <p><b>✋ הקלטה שלך</b> = הקלטה שהכנת בעצמך ב-ElevenLabs. היא נשארת כמו שהיא, וסקריפט ההקלטות לא דורס אותה. <b>🤖 נוצרה אוטומטית</b> = הקלטה שהסקריפט יצר. כדאי להקשיב לה, ולהקליט ידנית רק את מה שלא נשמע טוב. הכפתור "▶ רק מה שנוצר אוטומטית" משמיע רק אותן.</p>
   <p><b>מה עושים:</b> מאזינים ומסמנים ✓ ליד כל הקלטה שנשמעת מוזרה. הסימונים נשמרים בדפדפן הזה. "העתקת רשימת המסומנים" מעתיקה את כולם, ואפשר להדביק אותם לי.</p>
-  <p><b>כדי להקליט בעצמכם ב-ElevenLabs:</b> לוחצים על הטקסט המנוקד (עמודת "מה מדביקים ב-ElevenLabs") והוא מועתק. מדביקים אותו ב-ElevenLabs ובוחרים את אותו קול שמדבר בשורה, כדי שכל דמות תישמע אותו דבר לאורך ההדרכה. שומרים את הקובץ בשם שבעמודה האחרונה (לחיצה מעתיקה, למשל <code>w_baruch.mp3</code>), בתיקייה <code>הקלטות להחלפה</code> שבתיקיית המשחק. כשתסיימו, תגידו לי: אשווה את העוצמה לשאר ההקלטות ואכניס אותן למשחק.</p>
+  <p><b>כדי להקליט בעצמכם ב-ElevenLabs:</b> לוחצים על הטקסט בעמודת "מה מדביקים ב-ElevenLabs" והוא מועתק. בלי ניקוד המנוע מקריא טבעי יותר, ולכן מנקדים רק מילה שהוא קורא לא נכון (כמו אֲדוֹשֵׁם). מדביקים אותו ב-ElevenLabs ובוחרים את אותו קול שמדבר בשורה, כדי שכל דמות תישמע אותו דבר לאורך ההדרכה. שומרים את הקובץ בשם שבעמודה האחרונה (לחיצה מעתיקה, למשל <code>w_baruch.mp3</code>), בתיקייה <code>הקלטות להחלפה</code> שבתיקיית המשחק. כשתסיימו, תגידו לי: אשווה את העוצמה לשאר ההקלטות ואכניס אותן למשחק.</p>
   <p><b>הקולות בהדרכה</b> (מודל Eleven v3, שפה: עברית):</p>
   <ul>${speakers}</ul>
   <p>במקום ה׳ שולחים לקול "אֲדוֹשֵׁם".</p>
@@ -272,6 +288,7 @@ async function playRows(list){
   }
 }
 document.getElementById("all").onclick = () => playRows(rows);
+document.getElementById("onlyAuto").onclick = () => playRows(rows.filter(r => r.classList.contains("auto")));
 document.getElementById("onlyMarked").onclick = () => playRows(rows.filter(r => marks[r.dataset.name]));
 document.getElementById("stop").onclick = () => { playing++; document.querySelectorAll("audio").forEach(a => a.pause()); rows.forEach(r => r.classList.remove("on")); };
 document.getElementById("copyList").onclick = e => copy(rows.filter(r => marks[r.dataset.name])
