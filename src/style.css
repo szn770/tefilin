@@ -531,3 +531,27 @@ input, textarea, select { user-select: text; -webkit-user-select: text; touch-ac
 /* המחוות שייכות לאזור המשחק בלבד, כדי שבתפריטים אפשר יהיה להגדיל את התצוגה בצביטה */
 html { touch-action: manipulation; }
 #game { touch-action: none; }
+
+/* ---------- מסך נמוך (טלפון לרוחב): ההוראות קטנות, כדי לא להסתיר את האדם והתפילין ---------- */
+@media (max-height: 500px) {
+  #banner { top: 50px; padding: 4px 14px 5px; border-width: 2px; border-radius: 14px; max-width: min(560px, calc(100vw - 120px)); }
+  .learning #banner { top: 6px; }
+  .banner-step { font-size: 17px; line-height: 1.2; }
+  .banner-hint { font-size: 12px; margin-top: 0; }
+  #karaoke { bottom: 6px; gap: 4px; padding: 5px 6px; border-width: 2px; border-radius: 12px; width: calc(100vw - 16px); max-width: none; }
+  .word { font-size: 15px; padding: 2px 6px; border-width: 2px; border-radius: 9px; }
+  .word.active { animation-name: pulse-small; }
+  .keys-hint { display: none; }
+  #ring-guide { width: 130px; height: 130px; }
+  .ring-count { font-size: 22px; }
+  #choices { bottom: 10px; gap: 8px; }
+  .choice-btn { font-size: 15px; padding: 7px 12px; border-width: 2px; box-shadow: 0 4px 0 var(--gold-dark); }
+  #reading { bottom: 8px; max-width: 620px; border-width: 2px; }
+  .reading-text { max-height: 46vh; font-size: 14px; line-height: 1.5; padding: 8px 12px 2px; }
+  .reading-text .quiet { font-size: 12px; }
+  .reading-mark { font-size: 16px; padding: 5px; border-top-width: 2px; }
+  .popup { font-size: 24px; }
+  .popup.bad { font-size: 20px; }
+  .popup.big { font-size: 36px; }
+}
+@keyframes pulse-small { 50% { transform: scale(1.06); } }

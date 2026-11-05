@@ -72,6 +72,7 @@ export class Training {
     g.training = this;
     g.audio.voicesOn = true; // בהדרכה מנדי והמתלמד מדברים בקול
     g.ui.showHud(false);
+    document.body.classList.add('learning'); // בהדרכה אין שורת ניקוד, והכותרת עולה למעלה
     g.world.setDayProgress(0.1);
     const exit = document.getElementById('btn-learn-exit');
     exit.classList.remove('hidden');
