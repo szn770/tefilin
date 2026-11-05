@@ -96,6 +96,25 @@ async function boot() {
     if (document.hidden && game.state === 'day') setPaused(true);
   });
 
+  // ---- טלפון לאורך: המשחק נוח רק לרוחב ----
+  // אנדרואיד: בלחיצה על "מתחילים" עוברים למסך מלא וננעלים לרוחב (מותר רק אחרי לחיצה, ורק במסך מלא).
+  // אייפון לא מאפשר לאתר לנעול כיוון, ולכן שם (ובכל טלפון שמוחזק לאורך) מופיע "סובבו את הטלפון"
+  const goLandscape = async () => {
+    if (!matchMedia('(pointer: coarse)').matches || document.fullscreenElement) return;
+    try {
+      await document.documentElement.requestFullscreen({ navigationUI: 'hide' });
+      await screen.orientation.lock('landscape');
+    } catch { /* אין תמיכה: נשאר המסך "סובבו את הטלפון" */ }
+  };
+  for (const id of ['btn-start', 'btn-continue', 'btn-learn']) document.getElementById(id).addEventListener('click', goLandscape);
+  // מי שמסובב לאורך באמצע שלב, חוזר למשחק עצור ולא מפסיד לבבות
+  const portrait = matchMedia('(orientation: portrait) and (pointer: coarse) and (max-width: 700px)');
+  const pauseIfPortrait = () => {
+    if (portrait.matches && game.state === 'day' && !paused) setPaused(true);
+  };
+  portrait.addEventListener('change', pauseIfPortrait);
+  window.addEventListener('resize', pauseIfPortrait); // יש דפדפנים שלא מודיעים על שינוי ב-media query
+
   // ---- מקלדת ----
   window.addEventListener('keydown', (e) => {
     // כפתור שכבר נעלם מהמסך לא תופס את המקשים

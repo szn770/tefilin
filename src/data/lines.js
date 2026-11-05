@@ -23,7 +23,7 @@ export const LINES = [
   { id: 'm_repeat', voices: ['mendy'], text: 'תגיד אחריי את הברכה', say: 'תַּגִּיד אַחֲרַי אֶת הַבְּרָכָה' },
   { id: 'm_upper', voices: ['mendy'], text: 'שתי כריכות על הזרוע, ויחד עם הלולאה נוצרת האות שין', say: 'שְׁתֵּי כְּרִיכוֹת עַל הַזְּרוֹעַ, וְיַחַד עִם הַלּוּלָאָה נוֹצֶרֶת הָאוֹת שִׁין' },
   { id: 'm_wrap', voices: ['mendy'], text: 'עכשיו שבע כריכות!', say: 'עַכְשָׁו שֶׁבַע כְּרִיכוֹת!' },
-  { id: 'm_rosh', voices: ['mendy'], text: 'עכשיו של ראש – מעל השיער', say: 'עַכְשָׁו שֶׁל רֹאשׁ, מֵעַל הַשֵּׂעָר' },
+  { id: 'm_rosh', voices: ['mendy'], text: 'עכשיו של ראש, מעל השיער. הקשר מאחורה במרכז, והתפילין מקדימה מונחות במקום צמיחת השיער וקדימה' },
   { id: 'm_palm', voices: ['mendy'], text: 'עכשיו על כף היד: חצי כריכה, וכריכה שלמה', say: 'עַכְשָׁו עַל כַּף הַיָּד: חֲצִי כְּרִיכָה, וּכְרִיכָה שְׁלֵמָה' },
   { id: 'm_finger', voices: ['mendy'], text: 'שלוש כריכות על האצבע האמצעית: למטה, באמצע, ושוב למטה', say: 'שָׁלוֹשׁ כְּרִיכוֹת עַל הָאֶצְבַּע הָאֶמְצָעִית: לְמַטָּה, בָּאֶמְצַע, וְשׁוּב לְמַטָּה' },
   { id: 'm_shema', voices: ['mendy'], text: 'יד על העיניים, ונגיד שמע ישראל', say: 'יָד עַל הָעֵינַיִם, וְנַגִּיד שְׁמַע יִשְׂרָאֵל' },
@@ -46,6 +46,21 @@ export const LINES = [
   { id: 'w_shema', voices: ['mendy'], text: 'שמע' },
   { id: 'w_yisrael', voices: ['mendy'], text: 'ישראל' },
   { id: 'w_echad', voices: ['mendy'], text: 'אחד' },
+
+  // ---- הסברים במשחק הרגיל (guide): נשמעים גם כשהקולות כבויים, בשביל ילדים שעוד לא קוראים ----
+  // פתיחת כל שלב, ומשפט קצר בפעם הראשונה בשלב שמגיעה הפרעה. בלי ניקוד
+  { id: 'g_level1', guide: true, voices: ['mendy'], text: 'מתחילים! לוחצים על עוברים ושבים כדי לקרוא להם. מי שמדבר בטלפון צריך שלוש לחיצות. לא קוראים לנשים ולילדים.' },
+  { id: 'g_level2', guide: true, voices: ['mendy'], text: 'חדש: קרקפתא! מי שמסומן בכוכב עוד לא הניח תפילין אף פעם. צריך ארבע לחיצות, אבל הוא שווה חמישים נחת!' },
+  { id: 'g_level3', guide: true, voices: ['mendy'], text: 'חדש: לכלוך! כוסות ועטיפות נופלות ליד הדוכן. לחצו עליהן כדי לנקות. אם יש ארבע, אנשים לא רוצים לבוא!' },
+  { id: 'g_level4', guide: true, voices: ['mendy'], text: 'חדש: פקח העירייה! פקח הולך לכיוון הדוכן כדי לתת קנס. לחצו עליו פעמיים כדי להראות רישיון, לפני שהוא מגיע!' },
+  { id: 'g_level5', guide: true, voices: ['mendy'], text: 'חדש: יונים! יונה שנוחתת על השולחן עוצרת את השליח. לחצו עליה כדי לגרש אותה!' },
+  { id: 'g_level6', guide: true, voices: ['mendy'], text: 'חדש: אוטובוסים! אוטובוס מוריד הרבה אנשים בבת אחת. ויש גם ממהרים מאוד, צריך חמש לחיצות!' },
+  { id: 'g_level7', guide: true, voices: ['mendy'], text: 'לפני שבת! כולם ממהרים הביתה. כל מה שלמדתם, ביחד!' },
+  { id: 'g_more', guide: true, voices: ['mendy'], text: 'עוד יותר מהר! יותר אנשים, יותר ממהרים, יותר הפרעות. בהצלחה!' },
+  { id: 'h_trash', guide: true, voices: ['mendy'], text: 'לכלוך ליד הדוכן! לחצו עליו כדי לנקות' },
+  { id: 'h_inspector', guide: true, voices: ['mendy'], text: 'פקח בדרך! לחצו עליו פעמיים, לפני שהוא מגיע' },
+  { id: 'h_pigeon', guide: true, voices: ['mendy'], text: 'יונה על השולחן! לחצו עליה כדי לגרש אותה' },
+  { id: 'h_bus', guide: true, voices: ['mendy'], text: 'אוטובוס! הרבה אנשים יורדים בבת אחת' },
 
   // ---- עוברים ושבים ----
   { id: 'c_ok', voices: MEN, text: 'יאללה, בסדר!', say: 'יַאללָה, בְּסֵדֶר!' },
@@ -77,6 +92,9 @@ export const BRACHA = [
 export const SHEMA = ['w_shema', 'w_yisrael', 'w_hashem', 'w_elokeinu', 'w_hashem', 'w_echad'];
 
 // מה שנשמע בהדרכה, לפי הסדר. npm run voices:training מקליט רק את אלה
+// ההסברים שנשמעים במשחק הרגיל
+export const GUIDE_LINE_IDS = LINES.filter((l) => l.guide).map((l) => l.id);
+
 export const TRAINING_LINE_IDS = [
   'm_learn', 'c_righty', 'c_lefty', 'm_repeat', ...new Set([...BRACHA, ...SHEMA]),
   'm_upper', 'm_wrap', 'm_palm', 'm_rosh', 'm_finger', 'm_shema', 'm_remove', 'm_lechaim', 'c_thanks', 'm_mazal',

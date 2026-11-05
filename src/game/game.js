@@ -61,7 +61,8 @@ export class Game {
     this.state = 'menu';
     this.time = 0;
     this.slowFactor = 1;
-    this.input = null; // בהדרכה: מה עושה לחיצה בשלב הנוכחי
+    this.input = null;
+    this.voiceQueue = Promise.resolve(); // הסברים במשחק הרגיל, אחד אחרי השני // בהדרכה: מה עושה לחיצה בשלב הנוכחי
     this.training = null;
 
     this.mendy = new Person(MENDY_LOOK, { isMendy: true });
@@ -160,7 +161,10 @@ export class Game {
     this.level = getLevel(index);
     this.state = 'intro';
     this.ui.showHud(false);
-    await this.ui.showIntro(this.level);
+    const intro = this.ui.showIntro(this.level);
+    // מנדי מקריא את ההסבר, לילדים שעוד לא קוראים. הסברים על הפרעות מחכים שהוא יסיים
+    this.voiceQueue = this.audio.voice(this.level.intro.voice, 'mendy', { cut: true }).then((d) => wait(d));
+    await intro;
     this.startDay();
   }
 
@@ -341,11 +345,11 @@ export class Game {
   }
 
   // ---------- דיבור ונקודות ----------
-  async say(person, id, { block = true, voice = null } = {}) {
+  async say(person, id, { block = true, voice = null, cut = false } = {}) {
     const line = LINE_BY_ID[id];
     if (!line) return;
     const voiceKey = voice ?? (person.data ? person.data.type.voice : 'mendy');
-    const dur = await this.audio.voice(id, voiceKey);
+    const dur = await this.audio.voice(id, voiceKey, { cut });
     this.ui.bubble(line.text, () => this.headTop(person, 0.55), {
       cls: person.isMendy ? 'mendy' : '',
       duration: Math.max(1.4, dur + 0.5),

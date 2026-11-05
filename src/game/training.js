@@ -85,6 +85,13 @@ export class Training {
     }
   }
 
+  // משפטים בתור: כל משפט מחכה שהקודם ייגמר, גם כשהילד מתקדם מהר (למשל אחרי "של ראש" הארוך).
+  // מחזיר הבטחה שמתקיימת כשהמשפט הזה נגמר. בלי await – המשחק ממשיך בזמן שמדברים
+  speak(id, who = this.g.mendy) {
+    this.talking = this.talking.then(() => this.g.say(who, id));
+    return this.talking;
+  }
+
   async lesson() {
     const g = this.g;
     this.mistakes = 0;
@@ -103,12 +110,13 @@ export class Training {
     // כורכים תמיד כלפי חוץ: מעל האמה הרצועה זזה הרחק מהגוף. ביד שמאל הסליל הפוך (תמונת ראי)
     this.flip = this.side > 0;
     this.fx = this.flip ? -1 : 1; // לנקודות שמחברות בין הכריכות
+    this.talking = Promise.resolve();
 
     this.shotStand();
     g.mendy.faceTowards(SPOT.x, SPOT.z);
     await g.walkTo(c, SPOT, 2.2);
     c.faceYaw(-0.7 * this.side); // היד החלשה פונה למצלמה, ולא מוסתרת מאחורי הגוף
-    await g.say(g.mendy, 'm_learn');
+    await this.speak('m_learn');
     c.showAccessories(false);
     this.addFingers();
 
@@ -379,7 +387,7 @@ export class Training {
     const { c } = this;
     this.step(1, 'על איזו יד מניחים?', 'על היד החלשה – לא היד שכותבים איתה ✍️');
     this.shotUpper();
-    await this.g.say(c, this.c.data.lefty ? 'c_lefty' : 'c_righty');
+    await this.speak(this.c.data.lefty ? 'c_lefty' : 'c_righty', c);
     const opts = [1, -1].map((s) => {
       const k = s > 0 ? 'L' : 'R';
       const posFn = () => this.wp(c[`upper${k}`], V(0, 0, 0.08));
@@ -430,7 +438,7 @@ export class Training {
   async stepBracha() {
     this.step(3, 'הברכה', 'הקישו על המילים לפי הסדר – כל מילה נשמעת כשמקישים עליה');
     this.shotUpper();
-    await this.g.say(this.g.mendy, 'm_repeat');
+    await this.speak('m_repeat');
     await this.sayWords(BRACHA);
     this.good('אמן! 🙌');
   }
@@ -439,7 +447,7 @@ export class Training {
   async stepUpperArm() {
     const shoulder = this.c.joints['arm' + this.K];
     this.step(4, 'שתי כריכות על הזרוע', 'סובבו פעמיים סביב הזרוע – יחד עם הלולאה זו האות ש׳');
-    this.g.say(this.g.mendy, 'm_upper', { block: false });
+    this.speak('m_upper');
     this.shotShin();
     await wait(0.5);
     const [, first, second] = SHIN_FAN;
@@ -456,12 +464,12 @@ export class Training {
     await wait(1.1); // שיספיקו לראות את הש' לפני שהמצלמה זזה
   }
 
-  // שבע כריכות לפי מנהג חב"ד: חצי, 2 שלמות, רווח, 4 שלמות וחצי. ביחד 6 שלמות ו-2 חצאים
+  // שבע כריכות לפי מנהג חב"ד: אחת, 2, רווח, ועוד 4
   async stepWrap() {
     const { c } = this;
     const title = 'שבע כריכות על היד';
-    this.step(5, title, 'קודם חצי כריכה, מיד מתחת למרפק');
-    this.g.say(this.g.mendy, 'm_wrap', { block: false });
+    this.step(5, title, 'קודם כריכה אחת, מיד מתחת למרפק');
+    this.speak('m_wrap');
     this.shotClose(-0.17, 0.85);
     await wait(0.4);
     const elbow = c.joints['elbow' + this.K];
@@ -469,14 +477,13 @@ export class Training {
     const fx = this.fx;
     this.elbowStrap = strapMesh([V(SHIN_R * fx, SHIN_BASE, 0), V(0.086 * fx, -0.29, 0), V(0.082 * fx, -0.345, 0)]);
     c.joints['arm' + this.K].add(this.elbowStrap);
-    // הרווח נוצר בתחילת הסיבוב השלישי, כשהרצועה בצד האחורי של היד. מלפנים רואים רק רווח נקי
-    const keys = [[0, -0.045], [0.5, -0.062], [2.5, -0.105], [2.9, -0.15], [6.5, -0.238], [7, -0.262]];
+    // הרווח נוצר באמצע הסיבוב הרביעי, כשהרצועה בצד האחורי של היד. מלפנים רואים רק רווח נקי
+    const keys = [[0, -0.045], [1, -0.067], [3, -0.11], [3.5, -0.12], [3.9, -0.165], [7, -0.262]];
     this.armWrap = new Wrap(elbow, { radius: 0.084, turns: 7, flip: this.flip, yAt: lerpKeys(keys), lead: [V(0.082 * fx, 0, 0)] });
     const parts = [
-      { turns: 0.5, y: -0.055, label: () => '½' },
-      { turns: 2, y: -0.085, label: (n) => `${n}/2`, hint: 'עכשיו 2 כריכות שלמות' },
-      { turns: 4, y: -0.195, label: (n) => `${n}/4`, hint: 'משאירים רווח, ועוד 4 כריכות שלמות' },
-      { turns: 0.5, y: -0.25, label: () => '½', hint: 'ועוד חצי כריכה, לכיוון כף היד' },
+      { turns: 1, y: -0.055, label: (n) => `${n}/1` },
+      { turns: 2, y: -0.09, label: (n) => `${n}/2`, hint: 'עכשיו 2 כריכות' },
+      { turns: 4, y: -0.21, label: (n) => `${n}/4`, hint: 'משאירים רווח, ועוד 4 כריכות' },
     ];
     let done = 0;
     for (const p of parts) {
@@ -490,17 +497,16 @@ export class Training {
         onTurn: () => this.audio.sfx('wrap', Math.ceil(this.armWrap.progress * 7)),
       });
       done += p.turns;
-      if (p.turns < 1) this.audio.sfx('wrap', Math.ceil(done)); // בחצי כריכה אין סיבוב שלם שישמיע צליל
       await wait(0.3);
     }
-    this.good('6 שלמות ו-2 חצאים: שבע! 💪');
+    this.good('1, 2 ו-4: שבע! 💪');
   }
 
   async stepPalm() {
     const { c } = this;
     const title = 'כריכות על כף היד';
     this.step(6, title, 'קודם חצי כריכה – חצי סיבוב סביב כף היד');
-    this.g.say(this.g.mendy, 'm_palm', { block: false });
+    this.speak('m_palm');
     this.shotClose(-0.36, 0.62);
     await wait(0.45);
     const elbow = c.joints['elbow' + this.K];
@@ -529,7 +535,7 @@ export class Training {
   async stepRosh() {
     const { c } = this;
     this.step(7, 'של ראש', 'גררו את התפילין מעל קו השיער, באמצע');
-    this.g.say(this.g.mendy, 'm_rosh', { block: false });
+    this.speak('m_rosh');
     if (c.hatParts?.length) {
       c.hatParts.forEach((h) => (h.visible = false));
       this.ui.popupCenter('מורידים כובע 🧢', 'good');
@@ -562,7 +568,7 @@ export class Training {
   async stepFinger() {
     const title = 'שלוש כריכות על האצבע';
     this.step(8, title, 'על האצבע האמצעית: למטה, באמצע, ושוב למטה');
-    this.g.say(this.g.mendy, 'm_finger', { block: false });
+    this.speak('m_finger');
     this.shotClose();
     await wait(0.6);
     const axis = this.fingerAxis;
@@ -601,7 +607,7 @@ export class Training {
     c.setPose('shema', this.side);
     this.step(9, 'שמע ישראל', 'מכסים את העיניים – הקישו על המילים');
     this.shotUpper();
-    await this.g.say(this.g.mendy, 'm_shema');
+    await this.speak('m_shema');
     await this.sayWords(SHEMA, 2);
     // הפסוק הראשון מילה במילה, וכל השאר (עד "אמת") כקטע אחד שמסמנים
     c.setPose('armOut', this.side);
@@ -613,7 +619,7 @@ export class Training {
   async stepRemove() {
     const { c } = this;
     this.step(10, 'חולצים בסדר הפוך', 'מה מורידים קודם?');
-    this.g.say(this.g.mendy, 'm_remove', { block: false });
+    this.speak('m_remove');
     this.shotUpper();
     await wait(0.4);
     const roshOpt = { id: 'rosh', posFn: () => this.rosh.getWorldPosition(new THREE.Vector3()) };
@@ -660,8 +666,10 @@ export class Training {
     const { c } = this;
     const g = this.g;
     this.step(11, 'לחיים!', 'מה מגישים?');
+    // שמאלי עמד עם הגב למנדי בזמן ההנחה. עכשיו הוא מסתובב לשמוע מה מציעים לו
+    if (this.side < 0) c.faceTowards(g.mendy.root.position.x, g.mendy.root.position.z);
     this.shotStand();
-    await g.say(g.mendy, 'm_lechaim');
+    await this.speak('m_lechaim');
     const treat = await this.ui.choices(TREATS);
     g.mendy.setPose('offer');
     this.audio.sfx('coin');
@@ -679,9 +687,9 @@ export class Training {
     g.fx.confetti(this.wp(c.head, V(0, 0.3, 0)), 70);
     this.audio.sfx('success');
     c.setPose('cheer');
-    await g.say(c, 'c_thanks');
+    await this.speak('c_thanks', c);
     c.setPose('normal');
-    await g.say(g.mendy, 'm_mazal');
+    await this.speak('m_mazal');
     for (const t of [...this.targets]) this.removeTarget(t);
     g.leave(c); // הולך לדרכו, ונעלם בקצה הרחוב
     await wait(0.6);

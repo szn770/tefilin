@@ -4,31 +4,31 @@
 const BASE = [
   {
     name: 'הרחוב השכונתי', goal: 8, time: 75, features: [],
-    intro: { icon: '👋', title: 'מתחילים!', text: 'לוחצים על עוברים ושבים כדי לקרוא להם. מי שמדבר בטלפון 📱 צריך 3 לחיצות. לא קוראים לנשים ולילדים.' },
+    intro: { icon: '👋', voice: 'g_level1', title: 'מתחילים!', text: 'לוחצים על עוברים ושבים כדי לקרוא להם. מי שמדבר בטלפון 📱 צריך 3 לחיצות. לא קוראים לנשים ולילדים.' },
   },
   {
     name: 'פעם ראשונה', goal: 10, time: 80, features: ['first'],
-    intro: { icon: '⭐', title: 'חדש: קרקפתא!', text: 'מי שמסומן בכוכב עוד לא הניח תפילין אף פעם. צריך 4 לחיצות – אבל הוא שווה 50 נחת!' },
+    intro: { icon: '⭐', voice: 'g_level2', title: 'חדש: קרקפתא!', text: 'מי שמסומן בכוכב עוד לא הניח תפילין אף פעם. צריך 4 לחיצות – אבל הוא שווה 50 נחת!' },
   },
   {
     name: 'יום חם', goal: 12, time: 80, features: ['first', 'trash'],
-    intro: { icon: '🗑️', title: 'חדש: לכלוך!', text: 'כוסות ועטיפות נופלות ליד הדוכן. לחצו עליהן כדי לנקות. אם יש 4 – אנשים לא רוצים לבוא!' },
+    intro: { icon: '🗑️', voice: 'g_level3', title: 'חדש: לכלוך!', text: 'כוסות ועטיפות נופלות ליד הדוכן. לחצו עליהן כדי לנקות. אם יש 4 – אנשים לא רוצים לבוא!' },
   },
   {
     name: 'הפקח מגיע', goal: 14, time: 85, features: ['first', 'trash', 'inspector'],
-    intro: { icon: '📋', title: 'חדש: פקח העירייה!', text: 'פקח הולך לכיוון הדוכן כדי לתת קנס. לחצו עליו פעמיים כדי להראות רישיון – לפני שהוא מגיע!' },
+    intro: { icon: '📋', voice: 'g_level4', title: 'חדש: פקח העירייה!', text: 'פקח הולך לכיוון הדוכן כדי לתת קנס. לחצו עליו פעמיים כדי להראות רישיון – לפני שהוא מגיע!' },
   },
   {
     name: 'יונים בכיכר', goal: 16, time: 85, features: ['first', 'trash', 'inspector', 'pigeon'],
-    intro: { icon: '🐦', title: 'חדש: יונים!', text: 'יונה שנוחתת על השולחן עוצרת את השליח. לחצו עליה כדי לגרש אותה!' },
+    intro: { icon: '🐦', voice: 'g_level5', title: 'חדש: יונים!', text: 'יונה שנוחתת על השולחן עוצרת את השליח. לחצו עליה כדי לגרש אותה!' },
   },
   {
     name: 'שעת העומס', goal: 18, time: 90, features: ['first', 'trash', 'inspector', 'pigeon', 'bus', 'runner'],
-    intro: { icon: '🚌', title: 'חדש: אוטובוסים!', text: 'אוטובוס מוריד הרבה אנשים בבת אחת. ויש גם ממהרים מאוד ⏰ – 5 לחיצות!' },
+    intro: { icon: '🚌', voice: 'g_level6', title: 'חדש: אוטובוסים!', text: 'אוטובוס מוריד הרבה אנשים בבת אחת. ויש גם ממהרים מאוד ⏰ – 5 לחיצות!' },
   },
   {
     name: 'ערב שבת', goal: 20, time: 90, features: ['first', 'trash', 'inspector', 'pigeon', 'bus', 'runner'],
-    intro: { icon: '🕯️', title: 'לפני שבת!', text: 'כולם ממהרים הביתה. כל מה שלמדתם – ביחד!' },
+    intro: { icon: '🕯️', voice: 'g_level7', title: 'לפני שבת!', text: 'כולם ממהרים הביתה. כל מה שלמדתם – ביחד!' },
   },
 ];
 
@@ -40,7 +40,7 @@ export function getLevel(index) {
     goal: 20 + (index - BASE.length + 1) * 2,
     time: 90,
     features: ALL,
-    intro: { icon: '🔥', title: 'עוד יותר מהר!', text: 'יותר אנשים, יותר ממהרים, יותר הפרעות. בהצלחה!' },
+    intro: { icon: '🔥', voice: 'g_more', title: 'עוד יותר מהר!', text: 'יותר אנשים, יותר ממהרים, יותר הפרעות. בהצלחה!' },
   };
   const features = new Set(base.features);
   return {

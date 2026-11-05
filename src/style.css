@@ -481,6 +481,24 @@ input, textarea, select { user-select: text; -webkit-user-select: text; touch-ac
 .contact-status.ok { color: #1e8a4a; }
 .contact-status.err { color: #c0392b; }
 
+/* ---------- טלפון לאורך: "סובבו את הטלפון" מעל הכול ---------- */
+#rotate-hint { display: none; }
+@media (orientation: portrait) and (pointer: coarse) and (max-width: 700px) {
+  #rotate-hint {
+    display: flex; position: fixed; inset: 0; z-index: 1000;
+    flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+    padding: 24px; text-align: center; background: var(--navy); color: #fff;
+  }
+  #rotate-hint p { margin: 8px 0 0; font-family: 'Secular One', sans-serif; font-size: 30px; }
+  #rotate-hint small { font-size: 17px; opacity: .8; }
+  .rotate-phone { font-size: 90px; animation: turn-phone 2.2s ease-in-out infinite; }
+}
+@keyframes turn-phone {
+  0%, 25% { transform: rotate(0); }
+  55%, 85% { transform: rotate(-90deg); }
+  100% { transform: rotate(0); }
+}
+
 @media (max-width: 600px) {
   #hud { padding-left: 52px; gap: 6px; flex-wrap: wrap; }
   .sun-track { width: 28vw; }

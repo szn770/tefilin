@@ -16,7 +16,8 @@ export class GameAudio {
     this.available = new Set();
     this.buffers = new Map();
     this.loops = [];
-    // קולות מוקלטים רק בהדרכה. במשחק הרגיל הם מבלבלים, ולכן שם יש רק בועות טקסט
+    // קולות מוקלטים רק בהדרכה. במשחק הרגיל הם מבלבלים, ולכן שם יש רק בועות טקסט,
+    // חוץ מההסברים (guide ב-lines.js): פתיחת שלב והפרעה ראשונה, בשביל ילדים שעוד לא קוראים
     this.voicesOn = false;
   }
 
@@ -69,7 +70,7 @@ export class GameAudio {
   async voice(id, voiceKey, { cut = false } = {}) {
     const line = LINE_BY_ID[id];
     const estimate = line ? Math.max(1.1, line.text.length * 0.07) : 1.2;
-    if (!this.ctx || !this.voicesOn) return estimate;
+    if (!this.ctx || (!this.voicesOn && !line?.guide)) return estimate;
     const candidates = [`voice/${id}__${voiceKey}`, `voice/${id}`];
     const key = candidates.find((k) => this.available.has(k));
     if (!key) return estimate;

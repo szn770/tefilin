@@ -3,6 +3,7 @@ import { Person } from '../characters/person.js';
 import { INSPECTOR_LOOK } from '../data/customers.js';
 import { buildTrash, buildPigeon, buildBus, buildBusStop } from '../world/props.js';
 import { tween, ease, wait } from '../engine/tween.js';
+import { getLevel } from '../data/levels.js';
 
 // הפרעות שצריך לטפל בהן תוך כדי: לכלוך, פקח, יונים, אוטובוס.
 
@@ -23,8 +24,19 @@ export class Hazards {
 
   get dirty() { return this.trash.length >= DIRTY_AT; }
 
+  // בשלב שבו הפרעה חדשה, בפעם הראשונה שהיא מגיעה, מנדי אומר מה עושים (h_trash וכו' ב-lines.js).
+  // בשלבים הבאים הילדים כבר מכירים אותה, ולכן שותקים. המשפטים בתור: אף פעם לא אחד על השני
+  tell(kind) {
+    if (!this.fresh.has(kind) || this.told.has(kind)) return;
+    this.told.add(kind);
+    this.g.voiceQueue = this.g.voiceQueue.then(() => this.g.say(this.g.mendy, `h_${kind}`));
+  }
+
   reset(level) {
     this.level = level;
+    this.told = new Set();
+    const before = level.index > 0 ? getLevel(level.index - 1) : null;
+    this.fresh = new Set(level.features.filter((f) => !before?.has(f)));
     for (const t of this.trash) this.g.scene.remove(t.obj);
     this.trash = [];
     for (const p of this.pigeons) this.removePigeon(p);
@@ -60,6 +72,7 @@ export class Hazards {
     tween(0.3, (k) => obj.scale.setScalar(Math.max(0.01, k)), ease.back);
     const wasDirty = this.dirty;
     this.trash.push({ obj });
+    this.tell('trash');
     this.g.ui.setTrash(this.trash.length, this.dirty);
     if (this.dirty && !wasDirty) {
       this.g.ui.banner('🗑️ הדוכן מלוכלך!', 'אנשים לא רוצים לבוא – לחצו על הלכלוך כדי לנקות', 2.5);
@@ -97,6 +110,7 @@ export class Hazards {
     this.g.scene.add(p.root);
     this.inspector = p;
     this.g.audio.sfx('whistle');
+    this.tell('inspector');
   }
 
   tapInspector() {
@@ -191,6 +205,7 @@ export class Hazards {
       obj.rotation.set(0, rand(-0.6, 0.6), 0);
       p.tag = this.g.ui.tapsTag(() => obj.position.clone().add(V(0, 0.45, 0)), '🐦', '!');
       this.g.audio.sfx('coo');
+      this.tell('pigeon');
     });
   }
 
@@ -227,6 +242,7 @@ export class Hazards {
     this.g.scene.add(bus);
     this.g.audio.sfx('horn');
     this.g.ui.banner('🚌 אוטובוס!', 'הרבה אנשים יורדים בבת אחת', 2);
+    this.tell('bus');
     await tween(2.2, (k) => { bus.position.x = THREE.MathUtils.lerp(fromX, stopX, k); }, ease.out);
     const n = 4 + Math.floor(Math.random() * 3);
     for (let i = 0; i < n; i++) {

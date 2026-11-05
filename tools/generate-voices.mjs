@@ -7,6 +7,7 @@
 //   --force           להקליט מחדש גם משפטים שכבר קיימים
 //   --only=id1,id2    להקליט רק משפטים מסוימים
 //   --training        להקליט רק את המשפטים של ההדרכה (npm run voices:training)
+//   --guide           להקליט רק את ההסברים של המשחק הרגיל (פתיחת שלב והפרעה ראשונה)
 //   --sfx             ליצור גם רעשי רקע (רחוב)
 //   --dry-run         רק להציג מה יוקלט, בלי לשלוח בקשות
 //   --list-voices     להציג את הקולות שזמינים בחשבון (כדי לבחור קולות ב-tools/voices.json)
@@ -18,7 +19,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { LINES, LINE_BY_ID, VOICE_KEYS, TRAINING_LINE_IDS, BRACHA, SHEMA } from '../src/data/lines.js';
+import { LINES, LINE_BY_ID, VOICE_KEYS, TRAINING_LINE_IDS, GUIDE_LINE_IDS, BRACHA, SHEMA } from '../src/data/lines.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = path.join(ROOT, 'public', 'audio');
@@ -65,7 +66,7 @@ async function main() {
     if (!voices[k]) throw new Error(`אין קול מוגדר עבור "${k}" ב-tools/voices.json`);
   }
 
-  const only = flag('training') ? TRAINING_LINE_IDS : opt('only')?.split(',');
+  const only = flag('training') ? TRAINING_LINE_IDS : flag('guide') ? GUIDE_LINE_IDS : opt('only')?.split(',');
   const jobs = [];
   for (const line of LINES) {
     if (only && !only.includes(line.id)) continue;
@@ -188,6 +189,7 @@ function writeReview() {
     { title: 'הברכה, מילה במילה (נחתכו מהקלטה של הברכה המלאה, בשביל הנגנה טבעית)', rows: BRACHA.map((id) => row(LINE_BY_ID[id], 'mendy')) },
     { title: 'שמע ישראל, מילה במילה (נחתכו מהקלטה של הפסוק המלא. ה׳ ואלוקינו נשמעות מההקלטות של הברכה)', rows: SHEMA.filter((id) => !BRACHA.includes(id)).map((id) => row(LINE_BY_ID[id], 'mendy')) },
   ];
+  groups.push({ title: 'המשחק עצמו: פתיחת כל שלב, והפעם הראשונה בשלב שמגיעה הפרעה', rows: GUIDE_LINE_IDS.map((id) => row(LINE_BY_ID[id], 'mendy')) });
   const shown = new Set(groups.flatMap((g) => g.rows.map((r) => r.name)));
   groups.push({ title: 'מוקלטים, אבל לא נשמעים כרגע (במשחק הרגיל אין קולות)', old: true, rows: LINES.flatMap((l) => l.voices.map((v) => row(l, v))).filter((r) => !shown.has(r.name)) });
   groups.push({ title: 'מוזיקה', rows: [{ text: 'הניגון של כפתור הרמקול', say: '', voice: '', name: 'nigun', dir: 'sfx' }] });
